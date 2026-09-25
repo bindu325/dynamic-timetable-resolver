@@ -13,24 +13,42 @@ dotenv.config();
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware with cross-origin resource policy allowed
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
-const clientUrls = (process.env.CLIENT_URL || 'http://localhost:5173')
-  .split(',')
-  .map((url) => url.trim());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://dynamic-timetable-resolver.vercel.app',
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((u) => u.trim()) : []),
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps, curl, server-to-server)
+      // allow requests with no origin (mobile, Postman, curl, server-to-server)
       if (!origin) return callback(null, true);
-      if (clientUrls.includes('*') || clientUrls.includes(origin)) {
+      if (
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.onrender.com') ||
+        origin.includes('localhost')
+      ) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive in deployment if origin header varies
+      return callback(null, true);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['Authorization'],
   })
 );
 

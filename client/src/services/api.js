@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// Get raw baseURL or fallback to relative '/api'
+const rawBaseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Remove trailing slash if present
+const normalizedBaseURL = rawBaseURL.replace(/\/+$/, '');
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: normalizedBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,8 +28,12 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // If unauthorized, clear auth and redirect to login if not already there
+    const isAuthRoute =
+      error.config?.url?.includes('/auth/login') ||
+      error.config?.url?.includes('/auth/signup');
+
+    // Only clear token and redirect if it is a protected route that rejected an expired/invalid token
+    if (error.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {

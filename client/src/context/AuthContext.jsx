@@ -32,27 +32,37 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (email, password) => {
-    const res = await API.post('/auth/login', { email, password });
-    if (res.data.success) {
-      setToken(res.data.data.token);
-      setUser(res.data.data);
-      localStorage.setItem('token', res.data.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.data));
-      return res.data;
+    try {
+      const res = await API.post('/auth/login', { email, password });
+      if (res.data.success) {
+        setToken(res.data.data.token);
+        setUser(res.data.data);
+        localStorage.setItem('token', res.data.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.data));
+        return res.data;
+      }
+      throw new Error(res.data.message || 'Login failed');
+    } catch (err) {
+      const message = err.response?.data?.message || err.message || 'Login failed';
+      throw new Error(message);
     }
-    throw new Error(res.data.message || 'Login failed');
   };
 
   const signup = async (userData) => {
-    const res = await API.post('/auth/signup', userData);
-    if (res.data.success) {
-      setToken(res.data.data.token);
-      setUser(res.data.data);
-      localStorage.setItem('token', res.data.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.data));
-      return res.data;
+    try {
+      const res = await API.post('/auth/signup', userData);
+      if (res.data.success) {
+        setToken(res.data.data.token);
+        setUser(res.data.data);
+        localStorage.setItem('token', res.data.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.data));
+        return res.data;
+      }
+      throw new Error(res.data.message || 'Signup failed');
+    } catch (err) {
+      const message = err.response?.data?.message || err.message || 'Signup failed';
+      throw new Error(message);
     }
-    throw new Error(res.data.message || 'Signup failed');
   };
 
   const logout = () => {
