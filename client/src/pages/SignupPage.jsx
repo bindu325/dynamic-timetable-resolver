@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Sparkles, Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound } from 'lucide-react';
+import { Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound, CalendarDays, CheckCircle2 } from 'lucide-react';
 
 const SignupPage = ({ onSwitchToLogin }) => {
   const { signup } = useAuth();
@@ -29,151 +29,174 @@ const SignupPage = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
-      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8 font-sans">
+      <div className="w-full max-w-5xl bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
+        {/* Left Side: Product Branding */}
+        <div className="lg:col-span-6 bg-slate-900 text-white p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md z-10">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-2xl shadow-indigo-500/40 mb-4 p-0.5 transform hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#030712]/40 rounded-[22px] flex items-center justify-center backdrop-blur-sm">
-              <Sparkles className="w-8 h-8 text-white" />
+          <div className="space-y-6 relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-black">
+                <CalendarDays className="w-5 h-5 text-slate-950" />
+              </div>
+              <span className="font-extrabold text-base tracking-tight text-white">
+                Dynamic Timetable Resolver
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight font-heading">
+                Establish Your Scheduling Role
+              </h2>
+              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                Connect to university resources, manage availability constraints, or supervise institutional timetable optimization.
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <div className="flex items-center gap-3 text-xs text-slate-300">
+                <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>Role-based authorization for Admins, Faculty & Students</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-slate-300">
+                <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>Personalized faculty availability matrices</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-slate-300">
+                <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>Instant automated conflict resolution telemetry</span>
+              </div>
             </div>
           </div>
-          <h1 className="text-3xl font-black text-white tracking-tight font-heading">
-            <span className="bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">
-              Create Account
-            </span>
-          </h1>
-          <p className="text-xs font-semibold text-indigo-300/80 mt-1.5 uppercase tracking-widest">
-            Join the Timetable Optimization Platform
-          </p>
+
+          <div className="pt-8 text-[11px] text-slate-500 font-medium">
+            Dynamic Timetable Resolver · Secure Operations
+          </div>
         </div>
 
-        <div className="glass-panel rounded-3xl p-8 border border-slate-800/80 shadow-2xl shadow-black/80 relative">
-          <div className="flex items-center justify-between pb-5 mb-5 border-b border-slate-800/80">
+        {/* Right Side: Signup Form */}
+        <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center bg-white">
+          <div className="max-w-md w-full mx-auto space-y-5">
             <div>
-              <h2 className="text-base font-bold text-white font-heading">New Profile</h2>
-              <p className="text-xs text-slate-400">Enter details to establish access</p>
-            </div>
-            <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <UserPlus className="w-4 h-4 text-purple-400" />
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="Prof. John Doe"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner"
-                />
-              </div>
+              <h3 className="text-xl font-bold text-slate-900 tracking-tight">Create your account</h3>
+              <p className="text-xs text-slate-500 mt-1">Fill in the profile details below to get started</p>
             </div>
 
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  placeholder="john.doe@college.edu"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  minLength={6}
-                  placeholder="At least 6 characters"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Account Role
-              </label>
-              <div className="relative">
-                <Shield className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner cursor-pointer"
-                >
-                  <option value="VIEWER">Viewer (Student / Observer)</option>
-                  <option value="FACULTY">Faculty Member</option>
-                  <option value="ADMIN">System Administrator</option>
-                </select>
-              </div>
-            </div>
-
-            {formData.role === 'ADMIN' && (
-              <div className="p-4 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl space-y-2">
-                <label className="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
-                  <KeyRound className="w-3.5 h-3.5" />
-                  Admin Passkey (enter "ADMIN_2026")
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Full Name
                 </label>
-                <input
-                  type="password"
-                  value={formData.adminSecret}
-                  onChange={(e) => setFormData({ ...formData, adminSecret: e.target.value })}
-                  placeholder="ADMIN_2026"
-                  className="w-full bg-slate-900/90 border border-indigo-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400"
-                />
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="Prof. John Doe"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                  />
+                </div>
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-4 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-95 disabled:opacity-50 cursor-pointer"
-            >
-              {loading ? (
-                <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    placeholder="john.doe@college.edu"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    minLength={6}
+                    placeholder="At least 6 characters"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Account Role
+                </label>
+                <div className="relative">
+                  <Shield className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all cursor-pointer"
+                  >
+                    <option value="VIEWER">Viewer (Student / Observer)</option>
+                    <option value="FACULTY">Faculty Member</option>
+                    <option value="ADMIN">System Administrator</option>
+                  </select>
+                </div>
+              </div>
+
+              {formData.role === 'ADMIN' && (
+                <div className="p-3 bg-teal-50 border border-teal-200 rounded-xl space-y-1.5">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-teal-900">
+                    <KeyRound className="w-3.5 h-3.5 text-teal-700" />
+                    Admin Passkey (enter "ADMIN_2026")
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.adminSecret}
+                    onChange={(e) => setFormData({ ...formData, adminSecret: e.target.value })}
+                    placeholder="ADMIN_2026"
+                    className="w-full bg-white border border-teal-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-teal-600"
+                  />
+                </div>
               )}
-            </button>
-          </form>
-        </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6 font-medium">
-          Already have an account?{' '}
-          <button
-            onClick={onSwitchToLogin}
-            className="text-indigo-400 hover:text-indigo-300 font-bold underline underline-offset-4 ml-1 cursor-pointer"
-          >
-            Sign in here
-          </button>
-        </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-2 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Create Account</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p className="text-center text-xs text-slate-500 font-medium pt-2">
+              Already have an account?{' '}
+              <button
+                onClick={onSwitchToLogin}
+                className="text-teal-700 hover:text-teal-800 font-bold underline underline-offset-4 ml-1 cursor-pointer"
+              >
+                Sign in here
+              </button>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

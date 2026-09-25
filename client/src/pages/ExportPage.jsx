@@ -10,6 +10,8 @@ import {
   Building,
   User,
   GraduationCap,
+  Layers,
+  Printer,
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -54,7 +56,6 @@ const ExportPage = () => {
     fetchData();
   }, []);
 
-  // Filter entries according to chosen export scope
   const getFilteredEntries = () => {
     if (exportType === 'SECTION' && selectedTargetId !== 'ALL') {
       return entries.filter((e) => e.section?._id === selectedTargetId || e.section === selectedTargetId);
@@ -68,7 +69,6 @@ const ExportPage = () => {
     return entries;
   };
 
-  // Export to CSV
   const handleExportCSV = () => {
     try {
       const dataToExport = getFilteredEntries();
@@ -104,7 +104,6 @@ const ExportPage = () => {
     }
   };
 
-  // Export to PDF
   const handleExportPDF = () => {
     try {
       const dataToExport = getFilteredEntries();
@@ -115,8 +114,10 @@ const ExportPage = () => {
 
       const doc = new jsPDF();
       doc.setFontSize(16);
+      doc.setTextColor(15, 23, 42);
       doc.text('Academic Timetable & Schedule Report', 14, 15);
-      doc.setFontSize(10);
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
       doc.text(`Generated on: ${new Date().toLocaleString()} | Scope: ${exportType}`, 14, 22);
 
       const tableData = dataToExport.map((e) => [
@@ -134,7 +135,7 @@ const ExportPage = () => {
         body: tableData,
         startY: 28,
         theme: 'striped',
-        headStyles: { fillColor: [99, 102, 241] },
+        headStyles: { fillColor: [13, 148, 136] },
         styles: { fontSize: 8 },
       });
 
@@ -146,7 +147,6 @@ const ExportPage = () => {
     }
   };
 
-  // Export Conflict Report
   const handleExportConflictReportPDF = () => {
     try {
       if (conflicts.length === 0) {
@@ -156,10 +156,10 @@ const ExportPage = () => {
 
       const doc = new jsPDF();
       doc.setFontSize(16);
-      doc.setTextColor(220, 38, 38);
-      doc.text('Timetable Conflict & Collision Report', 14, 15);
-      doc.setFontSize(10);
-      doc.setTextColor(100);
+      doc.setTextColor(225, 29, 72);
+      doc.text('Timetable Conflict & Violation Audit Report', 14, 15);
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
       doc.text(`Generated on: ${new Date().toLocaleString()} | Total Collisions: ${conflicts.length}`, 14, 22);
 
       const tableData = conflicts.map((c) => [
@@ -174,7 +174,7 @@ const ExportPage = () => {
         body: tableData,
         startY: 28,
         theme: 'striped',
-        headStyles: { fillColor: [239, 68, 68] },
+        headStyles: { fillColor: [225, 29, 72] },
         styles: { fontSize: 8 },
       });
 
@@ -187,35 +187,45 @@ const ExportPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="glass-card rounded-2xl p-6 border border-slate-800">
-        <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-          Reporting & Documents
-        </span>
-        <h2 className="text-2xl font-bold text-white mt-0.5">Export Timetables & Conflict Reports</h2>
-        <p className="text-xs text-slate-400">
-          Generate printable PDF sheets and CSV tables for student sections, faculty, or institutional audits.
+      {/* Header */}
+      <div className="app-card p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+            <FileDown className="w-3.5 h-3.5" />
+            Reporting & Documents Hub
+          </span>
+          <span className="text-xs text-slate-500 font-medium">Data Export Center</span>
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Export Timetables & Audit Reports</h2>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Generate high-resolution printable PDF sheets, structured CSV datasets, or comprehensive conflict audit reports.
         </p>
       </div>
 
       {/* Scope Selector */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Select Export Scope</h3>
+      <div className="app-card p-6 space-y-5">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">1. Select Target Scope</h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Choose whether to generate an aggregate institution schedule or isolate by section, faculty, or room.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
           <button
             onClick={() => {
               setExportType('ALL');
               setSelectedTargetId('ALL');
             }}
-            className={`p-4 rounded-xl border text-left transition-all ${
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
               exportType === 'ALL'
-                ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-lg shadow-indigo-950/50'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                ? 'bg-teal-50/60 border-teal-600 ring-2 ring-teal-600/20 shadow-xs'
+                : 'bg-white border-slate-200 hover:border-slate-300'
             }`}
           >
-            <Calendar className="w-5 h-5 text-indigo-400 mb-2" />
-            <div className="font-bold text-xs">Complete Timetable</div>
-            <span className="text-[11px] text-slate-400">All periods and cohorts</span>
+            <Calendar className={`w-5 h-5 mb-2.5 ${exportType === 'ALL' ? 'text-teal-700' : 'text-slate-400'}`} />
+            <div className="font-bold text-xs text-slate-900">Complete Master Schedule</div>
+            <span className="text-[11px] text-slate-500 block mt-0.5">All periods across campus</span>
           </button>
 
           <button
@@ -223,15 +233,15 @@ const ExportPage = () => {
               setExportType('SECTION');
               setSelectedTargetId(sections[0]?._id || 'ALL');
             }}
-            className={`p-4 rounded-xl border text-left transition-all ${
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
               exportType === 'SECTION'
-                ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-lg shadow-indigo-950/50'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                ? 'bg-teal-50/60 border-teal-600 ring-2 ring-teal-600/20 shadow-xs'
+                : 'bg-white border-slate-200 hover:border-slate-300'
             }`}
           >
-            <GraduationCap className="w-5 h-5 text-sky-400 mb-2" />
-            <div className="font-bold text-xs">Section-Wise</div>
-            <span className="text-[11px] text-slate-400">Targeted student cohort</span>
+            <GraduationCap className={`w-5 h-5 mb-2.5 ${exportType === 'SECTION' ? 'text-teal-700' : 'text-slate-400'}`} />
+            <div className="font-bold text-xs text-slate-900">Section-Wise Cohort</div>
+            <span className="text-[11px] text-slate-500 block mt-0.5">Individual student batch</span>
           </button>
 
           <button
@@ -239,15 +249,15 @@ const ExportPage = () => {
               setExportType('FACULTY');
               setSelectedTargetId(faculties[0]?._id || 'ALL');
             }}
-            className={`p-4 rounded-xl border text-left transition-all ${
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
               exportType === 'FACULTY'
-                ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-lg shadow-indigo-950/50'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                ? 'bg-teal-50/60 border-teal-600 ring-2 ring-teal-600/20 shadow-xs'
+                : 'bg-white border-slate-200 hover:border-slate-300'
             }`}
           >
-            <User className="w-5 h-5 text-violet-400 mb-2" />
-            <div className="font-bold text-xs">Faculty-Wise</div>
-            <span className="text-[11px] text-slate-400">Individual lecturer load</span>
+            <User className={`w-5 h-5 mb-2.5 ${exportType === 'FACULTY' ? 'text-teal-700' : 'text-slate-400'}`} />
+            <div className="font-bold text-xs text-slate-900">Faculty-Wise Load</div>
+            <span className="text-[11px] text-slate-500 block mt-0.5">Individual instructor routine</span>
           </button>
 
           <button
@@ -255,33 +265,33 @@ const ExportPage = () => {
               setExportType('ROOM');
               setSelectedTargetId(rooms[0]?._id || 'ALL');
             }}
-            className={`p-4 rounded-xl border text-left transition-all ${
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
               exportType === 'ROOM'
-                ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-lg shadow-indigo-950/50'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                ? 'bg-teal-50/60 border-teal-600 ring-2 ring-teal-600/20 shadow-xs'
+                : 'bg-white border-slate-200 hover:border-slate-300'
             }`}
           >
-            <Building className="w-5 h-5 text-emerald-400 mb-2" />
-            <div className="font-bold text-xs">Room-Wise</div>
-            <span className="text-[11px] text-slate-400">Hall occupancy schedule</span>
+            <Building className={`w-5 h-5 mb-2.5 ${exportType === 'ROOM' ? 'text-teal-700' : 'text-slate-400'}`} />
+            <div className="font-bold text-xs text-slate-900">Room-Wise Occupancy</div>
+            <span className="text-[11px] text-slate-500 block mt-0.5">Hall booking timetable</span>
           </button>
         </div>
 
         {/* Dynamic target selector */}
         {exportType !== 'ALL' && (
-          <div className="pt-2 max-w-sm text-xs">
-            <label className="block text-slate-300 font-medium mb-1">
+          <div className="pt-1 max-w-sm text-xs">
+            <label className="block text-slate-700 font-semibold mb-1.5">
               Select Specific {exportType}:
             </label>
             <select
               value={selectedTargetId}
               onChange={(e) => setSelectedTargetId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
             >
               {exportType === 'SECTION' &&
                 sections.map((s) => (
                   <option key={s._id} value={s._id}>
-                    {s.name} ({s.department} Sem {s.semester})
+                    {s.name} ({s.department} · Sem {s.semester})
                   </option>
                 ))}
 
@@ -303,30 +313,33 @@ const ExportPage = () => {
         )}
 
         {/* Action Export Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-800">
-          <button
-            onClick={handleExportPDF}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Download Timetable PDF</span>
-          </button>
+        <div className="pt-4 border-t border-slate-100">
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">2. Choose Output Format</h4>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleExportPDF}
+              className="btn-primary text-xs flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Download Timetable PDF</span>
+            </button>
 
-          <button
-            onClick={handleExportCSV}
-            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700 flex items-center gap-2"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-            <span>Download CSV (Excel)</span>
-          </button>
+            <button
+              onClick={handleExportCSV}
+              className="btn-secondary text-xs flex items-center gap-2"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Download CSV (Excel)</span>
+            </button>
 
-          <button
-            onClick={handleExportConflictReportPDF}
-            className="px-5 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/60 text-rose-200 text-xs font-semibold border border-rose-500/30 flex items-center gap-2"
-          >
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
-            <span>Download Conflict Audit Report</span>
-          </button>
+            <button
+              onClick={handleExportConflictReportPDF}
+              className="px-4 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs border border-rose-200 flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <span>Download Conflict Audit Report</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

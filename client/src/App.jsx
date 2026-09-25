@@ -85,11 +85,11 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-semibold tracking-wider uppercase">
-            Initializing Dynamic Resolver Engine...
+          <div className="w-9 h-9 border-3 border-teal-600 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-slate-500 font-semibold tracking-wider uppercase">
+            Loading Operations Environment...
           </span>
         </div>
       </div>
@@ -105,7 +105,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex">
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -124,9 +124,10 @@ function App() {
           onQuickScan={handleQuickScan}
           activeConflictCount={activeConflictCount}
           isScanning={isScanning}
+          activeTab={activeTab}
         />
 
-        <main className="p-6 flex-1 max-w-7xl w-full mx-auto">
+        <main className="p-6 sm:p-8 flex-1 max-w-7xl w-full mx-auto">
           {activeTab === 'dashboard' && <DashboardPage setActiveTab={setActiveTab} />}
           {activeTab === 'timetable' && (
             <TimetablePage onOpenResolverForEntry={handleOpenResolverForEntry} />

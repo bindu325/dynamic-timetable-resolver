@@ -11,6 +11,8 @@ import {
   RotateCcw,
   Sparkles,
   Info,
+  Calendar,
+  User,
 } from 'lucide-react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -39,7 +41,9 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
       const res = await API.get('/faculty');
       if (res.data.success) {
         setFaculties(res.data.data);
-        const defaultId = targetFacultyId || (isFaculty && user.facultyId ? user.facultyId._id || user.facultyId : res.data.data[0]?._id);
+        const defaultId =
+          targetFacultyId ||
+          (isFaculty && user?.facultyId ? user.facultyId._id || user.facultyId : res.data.data[0]?._id);
         if (defaultId) setSelectedFacultyId(defaultId);
       }
     } catch (err) {
@@ -58,7 +62,6 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
       const fac = faculties.find((f) => f._id === selectedFacultyId);
       if (fac) {
         setCurrentFaculty(fac);
-        // Build initial matrix
         const matrix = {};
         DAYS.forEach((day) => {
           matrix[day] = {};
@@ -119,7 +122,6 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
 
       if (res.data.success) {
         success('Faculty availability preferences updated! Re-validating conflicts...');
-        // Trigger background conflict check to alert if current timetable now collides
         await API.post('/conflicts/check');
       }
     } catch (err) {
@@ -132,123 +134,133 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            Faculty Workload & Preferences
-          </span>
-          <h2 className="text-2xl font-bold text-white mt-0.5">
-            Weekly Availability Matrix
-          </h2>
-          <p className="text-xs text-slate-400">
-            Configure preferred working hours and mark unavailable slots to prevent collision.
-          </p>
-        </div>
+      <div className="app-card p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+                <UserCheck className="w-3.5 h-3.5" />
+                Faculty Working Preferences
+              </span>
+              <span className="text-xs text-slate-500 font-medium">Weekly Shift Constraints</span>
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              Faculty Availability Matrix
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Set availability preferences per faculty member. The resolver strictly respects "Unavailable" hard constraints.
+            </p>
+          </div>
 
-        <div className="flex items-center gap-3">
-          {/* Faculty Selector (Admin only or switcher) */}
-          {isAdmin && (
-            <select
-              value={selectedFacultyId}
-              onChange={(e) => setSelectedFacultyId(e.target.value)}
-              className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+          <div className="flex flex-wrap items-center gap-3">
+            {isAdmin && (
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-slate-400" />
+                <select
+                  value={selectedFacultyId}
+                  onChange={(e) => setSelectedFacultyId(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
+                >
+                  {faculties.map((f) => (
+                    <option key={f._id} value={f._id}>
+                      {f.name} ({f.department})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <button
+              onClick={handleSaveAvailability}
+              disabled={saving}
+              className="btn-primary text-xs flex items-center gap-2 disabled:opacity-50"
             >
-              {faculties.map((f) => (
-                <option key={f._id} value={f._id}>
-                  {f.name} ({f.department})
-                </option>
-              ))}
-            </select>
-          )}
-
-          <button
-            onClick={handleSaveAvailability}
-            disabled={saving}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving...' : 'Save Availability'}</span>
-          </button>
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Availability'}</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Legend */}
-      <div className="glass-card px-5 py-3 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
-        <span className="text-slate-400 font-medium">Click any time cell to toggle state:</span>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-              <Check className="w-2.5 h-2.5" />
+        {/* Legend Toolbar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 text-xs">
+          <span className="text-slate-600 font-medium">Click any time cell to cycle through status:</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500">
+                <Check className="w-2.5 h-2.5" />
+              </div>
+              <span className="text-slate-700 font-medium">Available (Default)</span>
             </div>
-            <span className="text-slate-300">Available</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
-              <X className="w-2.5 h-2.5" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700">
+                <X className="w-2.5 h-2.5" />
+              </div>
+              <span className="text-slate-700 font-medium">Unavailable (Hard Constraint)</span>
             </div>
-            <span className="text-slate-300">Unavailable (Hard Constraint)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              <Star className="w-2.5 h-2.5" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                <Star className="w-2.5 h-2.5" />
+              </div>
+              <span className="text-slate-700 font-medium">Preferred (Optimizer Boost)</span>
             </div>
-            <span className="text-slate-300">Preferred (Optimizer Boost)</span>
           </div>
         </div>
       </div>
 
       {/* Visual Availability Matrix Grid */}
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+      <div className="app-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-center border-collapse min-w-[700px]">
+          <table className="w-full text-center border-collapse min-w-[760px]">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/90 text-slate-400 text-xs font-semibold">
-                <th className="p-4 text-left">Day / Time Slot</th>
+              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 text-xs font-semibold">
+                <th className="p-4 text-left w-32 bg-slate-100/90 text-slate-700 font-bold border-r border-slate-200">
+                  Day / Time Slot
+                </th>
                 {SLOTS.map((slot) => (
-                  <th key={slot.startTime} className="p-4 border-l border-slate-800">
-                    {slot.startTime} - {slot.endTime}
+                  <th key={slot.startTime} className="p-3.5 border-l border-slate-200 first:border-l-0">
+                    <span className="block text-slate-800 font-bold">{slot.startTime} - {slot.endTime}</span>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-xs">
+            <tbody className="divide-y divide-slate-100 text-xs">
               {DAYS.map((day) => (
-                <tr key={day} className="hover:bg-slate-900/40 transition-colors">
-                  <td className="p-4 text-left font-bold text-indigo-300 bg-slate-900/50">
+                <tr key={day} className="hover:bg-slate-50/40 transition-colors">
+                  <td className="p-4 text-left font-bold text-slate-900 bg-slate-50/90 border-r border-slate-200">
                     {day}
                   </td>
                   {SLOTS.map((slot) => {
                     const key = `${slot.startTime}-${slot.endTime}`;
                     const status = availabilityMatrix[day]?.[key] || 'AVAILABLE';
                     return (
-                      <td key={key} className="p-2.5 border-l border-slate-800/60">
+                      <td key={key} className="p-2 border-l border-slate-100">
                         <button
                           type="button"
                           onClick={() => toggleSlotStatus(day, key)}
-                          className={`w-full py-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                          className={`w-full py-3 px-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                             status === 'UNAVAILABLE'
-                              ? 'bg-rose-950/40 border-rose-500/40 text-rose-300 shadow-md shadow-rose-950/30'
+                              ? 'bg-rose-50 border-rose-200 text-rose-800 shadow-xs'
                               : status === 'PREFERRED'
-                              ? 'bg-amber-950/40 border-amber-500/40 text-amber-300 shadow-md shadow-amber-950/30'
-                              : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                              ? 'bg-amber-50 border-amber-200 text-amber-800 shadow-xs'
+                              : 'bg-white border-slate-200/90 text-slate-500 hover:border-teal-400 hover:bg-teal-50/20'
                           }`}
                         >
                           {status === 'UNAVAILABLE' && (
                             <>
-                              <X className="w-4 h-4 text-rose-400" />
-                              <span className="text-[10px] font-bold">UNAVAILABLE</span>
+                              <X className="w-4 h-4 text-rose-600" />
+                              <span className="text-[10px] font-bold tracking-wider">UNAVAILABLE</span>
                             </>
                           )}
                           {status === 'PREFERRED' && (
                             <>
-                              <Star className="w-4 h-4 text-amber-400" />
-                              <span className="text-[10px] font-bold">PREFERRED</span>
+                              <Star className="w-4 h-4 text-amber-600 fill-amber-500" />
+                              <span className="text-[10px] font-bold tracking-wider">PREFERRED</span>
                             </>
                           )}
                           {status === 'AVAILABLE' && (
                             <>
-                              <Check className="w-4 h-4 text-emerald-400 opacity-60" />
-                              <span className="text-[10px] opacity-70">AVAILABLE</span>
+                              <Check className="w-4 h-4 text-emerald-600" />
+                              <span className="text-[10px] font-medium text-slate-600">AVAILABLE</span>
                             </>
                           )}
                         </button>

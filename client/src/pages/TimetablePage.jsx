@@ -14,9 +14,11 @@ import {
   Trash2,
   Edit2,
   X,
-  FileDown,
   Layers,
-  Search,
+  CheckCircle2,
+  Clock,
+  ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -81,7 +83,6 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
       if (secRes.data.success) {
         setSections(secRes.data.data);
         if (!selectedSection && secRes.data.data.length > 0) {
-          // If faculty logged in, default to their section/timetable or CSE-A
           setSelectedSection(secRes.data.data[0]._id);
         }
       }
@@ -179,7 +180,6 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
       }
     } catch (err) {
       if (err.response?.status === 409) {
-        // Hard conflict detected! Display inline warning and prompt
         setModalConflictWarning({
           message: err.response.data.message,
           conflicts: err.response.data.conflicts || [],
@@ -206,30 +206,54 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
     }
   };
 
-  // Helper to find entry matching day and time
   const getEntryForSlot = (day, startTime) => {
     return entries.find((e) => e.day === day && e.startTime === startTime);
   };
 
+  const conflictCount = entries.filter((e) => e.hasConflict).length;
+
   return (
     <div className="space-y-6">
-      {/* Header & Filter Controls */}
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header & Controls Panel */}
+      <div className="app-card p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div>
-            <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-              Schedule Visualizer
-            </span>
-            <h2 className="text-2xl font-bold text-white mt-0.5">
-              Academic Timetable Grid
-            </h2>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+                <Calendar className="w-3.5 h-3.5" />
+                Schedule Matrix
+              </span>
+              {conflictCount > 0 ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                  <AlertTriangle className="w-3 h-3" />
+                  {conflictCount} active conflict{conflictCount > 1 ? 's' : ''}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Optimal Schedule
+                </span>
+              )}
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Academic Timetable Matrix</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Inspect session allocations, verify room occupancies, and manage period schedules across departments.
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={fetchEntries}
+              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+              title="Refresh timetable"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+
             {isAdmin && (
               <button
                 onClick={() => handleOpenCreateModal()}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all"
+                className="btn-primary text-xs flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Class Entry</span>
@@ -238,32 +262,38 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
           </div>
         </div>
 
-        {/* Filter Toolbar */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/80 text-xs">
+        {/* Filter Controls */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 pt-4">
           <div>
-            <label className="block text-slate-400 font-medium mb-1">Filter by Section</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-slate-400" />
+              Section Filter
+            </label>
             <select
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all"
             >
               <option value="ALL">All Sections (Aggregate)</option>
               {sections.map((s) => (
                 <option key={s._id} value={s._id}>
-                  {s.name} ({s.department} Sem {s.semester})
+                  {s.name} ({s.department} · Sem {s.semester})
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-slate-400 font-medium mb-1">Filter by Faculty</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-slate-400" />
+              Faculty Filter
+            </label>
             <select
               value={selectedFaculty}
               onChange={(e) => setSelectedFaculty(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all"
             >
-              <option value="ALL">All Faculty</option>
+              <option value="ALL">All Faculty Members</option>
               {faculties.map((f) => (
                 <option key={f._id} value={f._id}>
                   {f.name} ({f.department})
@@ -273,29 +303,35 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
           </div>
 
           <div>
-            <label className="block text-slate-400 font-medium mb-1">Filter by Room</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <DoorClosed className="w-3.5 h-3.5 text-slate-400" />
+              Room / Facility
+            </label>
             <select
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all"
             >
               <option value="ALL">All Rooms & Labs</option>
               {rooms.map((r) => (
                 <option key={r._id} value={r._id}>
-                  {r.roomNumber} ({r.roomType}, Cap: {r.capacity})
+                  {r.roomNumber} ({r.roomType} · Cap: {r.capacity})
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-slate-400 font-medium mb-1">Filter by Day</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              Day Scope
+            </label>
             <select
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all"
             >
-              <option value="ALL">All Days (Monday - Saturday)</option>
+              <option value="ALL">All Days (Mon – Sat)</option>
               {DAYS.map((d) => (
                 <option key={d} value={d}>
                   {d}
@@ -307,25 +343,28 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
       </div>
 
       {/* Timetable Interactive Grid */}
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+      <div className="app-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[900px]">
+          <table className="w-full text-left border-collapse min-w-[960px]">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/90 text-slate-400 text-xs font-semibold">
-                <th className="p-4 w-28 text-center bg-slate-900/95 sticky left-0 z-10">Day / Time</th>
+              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 text-xs font-semibold">
+                <th className="p-4 w-32 text-center bg-slate-100/90 text-slate-700 font-bold sticky left-0 z-10 border-r border-slate-200">
+                  Day / Period
+                </th>
                 {DEFAULT_TIME_SLOTS.map((slot) => (
-                  <th key={slot.label} className="p-4 text-center border-l border-slate-800/80">
-                    <span className="block text-slate-200 font-bold">{slot.label}</span>
+                  <th key={slot.label} className="p-3.5 text-center border-l border-slate-200 first:border-l-0">
+                    <span className="block text-slate-800 font-bold">{slot.label}</span>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-xs">
+            <tbody className="divide-y divide-slate-100 text-xs">
               {(selectedDay === 'ALL' ? DAYS : [selectedDay]).map((day) => (
-                <tr key={day} className="hover:bg-slate-900/30 transition-colors">
-                  {/* Day Row Header */}
-                  <td className="p-4 font-bold text-center text-indigo-300 bg-slate-900/70 border-r border-slate-800 sticky left-0 z-10">
-                    {day}
+                <tr key={day} className="hover:bg-slate-50/40 transition-colors">
+                  {/* Day Sticky Header */}
+                  <td className="p-4 font-bold text-center text-slate-900 bg-slate-50/90 border-r border-slate-200 sticky left-0 z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.05)]">
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-700">{day.substring(0, 3)}</div>
+                    <div className="text-[11px] font-normal text-slate-400 mt-0.5">{day}</div>
                   </td>
 
                   {DEFAULT_TIME_SLOTS.map((slot) => {
@@ -333,67 +372,69 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                     return (
                       <td
                         key={slot.start}
-                        className="p-2.5 align-top border-l border-slate-800/60 h-28 w-44"
+                        className="p-2 align-top border-l border-slate-100 h-32 w-48"
                       >
                         {entry ? (
                           <div
                             className={`p-3 rounded-xl border flex flex-col justify-between h-full transition-all group relative ${
                               entry.hasConflict
-                                ? 'bg-rose-950/40 border-rose-500/50 hover:border-rose-400 glow-rose'
-                                : 'bg-slate-900/90 border-slate-800 hover:border-indigo-500/50 hover:bg-slate-850'
+                                ? 'bg-rose-50/70 border-rose-200 hover:border-rose-400 hover:shadow-sm'
+                                : 'bg-white border-slate-200/90 hover:border-teal-400 hover:shadow-md'
                             }`}
                           >
                             <div>
-                              <div className="flex items-start justify-between gap-1 mb-1">
-                                <span className="font-bold text-white text-xs leading-tight truncate">
+                              <div className="flex items-start justify-between gap-1 mb-1.5">
+                                <span className="font-bold text-slate-900 text-xs leading-tight truncate">
                                   {entry.subject?.name || 'Subject'}
                                 </span>
                                 {entry.hasConflict && (
                                   <AlertTriangle
-                                    className="w-4 h-4 text-rose-400 shrink-0 animate-pulse"
+                                    className="w-4 h-4 text-rose-600 shrink-0 animate-bounce"
                                     title={entry.conflictSummary || 'Conflict detected!'}
                                   />
                                 )}
                               </div>
 
-                              <div className="space-y-0.5 text-[11px] text-slate-400">
-                                <div className="flex items-center gap-1 text-indigo-300">
-                                  <User className="w-3 h-3" />
+                              <div className="space-y-1 text-[11px] text-slate-500">
+                                <div className="flex items-center gap-1.5 text-teal-700 font-medium truncate">
+                                  <User className="w-3 h-3 text-teal-600 shrink-0" />
                                   <span className="truncate">{entry.faculty?.name || 'Faculty'}</span>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                  <DoorClosed className="w-3 h-3 text-slate-500" />
-                                  <span>{entry.room?.roomNumber || 'Room'}</span>
-                                  <span className="text-[10px] px-1 rounded bg-slate-800 text-slate-300">
+                                <div className="flex items-center justify-between text-slate-500">
+                                  <span className="flex items-center gap-1">
+                                    <DoorClosed className="w-3 h-3 text-slate-400 shrink-0" />
+                                    <span>{entry.room?.roomNumber || 'Room'}</span>
+                                  </span>
+                                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200/60">
                                     {entry.section?.name || 'Sec'}
                                   </span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Entry Actions */}
+                            {/* Entry Controls */}
                             {isAdmin && (
-                              <div className="flex items-center justify-end gap-1.5 mt-2 pt-1 border-t border-slate-800/80 opacity-90 group-hover:opacity-100">
+                              <div className="flex items-center justify-end gap-1.5 mt-2 pt-1.5 border-t border-slate-100 opacity-90 group-hover:opacity-100">
                                 {entry.hasConflict && (
                                   <button
                                     onClick={() => onOpenResolverForEntry?.(entry)}
-                                    className="p-1 rounded bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 text-[10px] font-semibold flex items-center gap-1 px-1.5"
+                                    className="px-2 py-0.5 rounded-md bg-rose-600 text-white hover:bg-rose-700 text-[10px] font-bold flex items-center gap-1 shadow-sm transition-all"
                                     title="Auto-Resolve Conflict"
                                   >
                                     <Sparkles className="w-3 h-3" />
-                                    <span>Solve</span>
+                                    <span>Resolve</span>
                                   </button>
                                 )}
                                 <button
                                   onClick={() => handleOpenEditModal(entry)}
-                                  className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
+                                  className="p-1 rounded hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
                                   title="Edit Entry"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteEntry(entry._id)}
-                                  className="p-1 rounded hover:bg-rose-500/10 text-slate-400 hover:text-rose-400"
+                                  className="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
                                   title="Delete Entry"
                                 >
                                   <Trash2 className="w-3 h-3" />
@@ -404,13 +445,13 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                         ) : (
                           <div
                             onClick={() => isAdmin && handleOpenCreateModal(day, slot.start, slot.end)}
-                            className={`h-full rounded-xl border border-dashed border-slate-800/60 flex items-center justify-center transition-all ${
+                            className={`h-full rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center transition-all ${
                               isAdmin
-                                ? 'hover:border-indigo-500/40 hover:bg-indigo-950/10 cursor-pointer text-slate-600 hover:text-indigo-400'
-                                : 'text-slate-700'
+                                ? 'hover:border-teal-400 hover:bg-teal-50/40 cursor-pointer text-slate-400 hover:text-teal-700'
+                                : 'text-slate-300'
                             }`}
                           >
-                            <span className="text-[11px] font-medium">+ Free</span>
+                            <span className="text-[11px] font-medium">+ Open Slot</span>
                           </div>
                         )}
                       </td>
@@ -425,15 +466,20 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
 
       {/* Add / Edit Entry Modal */}
       {showEntryModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card rounded-2xl max-w-lg w-full p-6 border border-slate-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white">
-                {editingEntry ? 'Edit Timetable Schedule' : 'Schedule New Class Period'}
-              </h3>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  {editingEntry ? 'Edit Class Schedule' : 'Schedule New Period'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Assign section, faculty, and room with automatic conflict validation.
+                </p>
+              </div>
               <button
                 onClick={() => setShowEntryModal(false)}
-                className="text-slate-400 hover:text-white p-1"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -441,17 +487,17 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
 
             {/* In-Modal Conflict Alert */}
             {modalConflictWarning && (
-              <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs space-y-2">
-                <div className="flex items-center gap-2 font-bold">
-                  <AlertTriangle className="w-4 h-4 text-rose-400" />
-                  <span>Conflict Warning</span>
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-2">
+                <div className="flex items-center gap-2 font-bold text-rose-800">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                  <span>Hard Constraint Conflict Detected</span>
                 </div>
-                <p>{modalConflictWarning.message}</p>
+                <p className="text-rose-700">{modalConflictWarning.message}</p>
                 <div className="pt-2 flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleSaveEntry(true)}
-                    className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold text-[11px]"
+                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition-colors"
                   >
                     Force Save Anyway
                   </button>
@@ -461,10 +507,10 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                       setShowEntryModal(false);
                       onOpenResolverForEntry?.(editingEntry || entryForm);
                     }}
-                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[11px] flex items-center gap-1"
+                    className="btn-primary text-xs py-1.5 flex items-center gap-1.5"
                   >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Find Feasible Alternative</span>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Find Alternative Slot</span>
                   </button>
                 </div>
               </div>
@@ -472,11 +518,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Section</label>
+                <label className="block text-slate-700 font-semibold mb-1">Academic Section</label>
                 <select
                   value={entryForm.section}
                   onChange={(e) => setEntryForm({ ...entryForm, section: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {sections.map((s) => (
                     <option key={s._id} value={s._id}>
@@ -487,11 +533,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Subject</label>
+                <label className="block text-slate-700 font-semibold mb-1">Course Subject</label>
                 <select
                   value={entryForm.subject}
                   onChange={(e) => setEntryForm({ ...entryForm, subject: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {subjects.map((sub) => (
                     <option key={sub._id} value={sub._id}>
@@ -502,11 +548,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Faculty Member</label>
+                <label className="block text-slate-700 font-semibold mb-1">Assigned Faculty</label>
                 <select
                   value={entryForm.faculty}
                   onChange={(e) => setEntryForm({ ...entryForm, faculty: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {faculties.map((f) => (
                     <option key={f._id} value={f._id}>
@@ -517,26 +563,26 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Room / Lab</label>
+                <label className="block text-slate-700 font-semibold mb-1">Allocated Room / Lab</label>
                 <select
                   value={entryForm.room}
                   onChange={(e) => setEntryForm({ ...entryForm, room: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {rooms.map((r) => (
                     <option key={r._id} value={r._id}>
-                      {r.roomNumber} ({r.roomType}, Cap: {r.capacity})
+                      {r.roomNumber} ({r.roomType} · Cap: {r.capacity})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Day</label>
+                <label className="block text-slate-700 font-semibold mb-1">Day of Week</label>
                 <select
                   value={entryForm.day}
                   onChange={(e) => setEntryForm({ ...entryForm, day: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {DAYS.map((d) => (
                     <option key={d} value={d}>
@@ -547,14 +593,14 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Time Slot</label>
+                <label className="block text-slate-700 font-semibold mb-1">Time Period</label>
                 <select
                   value={`${entryForm.startTime}-${entryForm.endTime}`}
                   onChange={(e) => {
                     const [start, end] = e.target.value.split('-');
                     setEntryForm({ ...entryForm, startTime: start, endTime: end });
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                 >
                   {DEFAULT_TIME_SLOTS.map((slot) => (
                     <option key={slot.label} value={`${slot.start}-${slot.end}`}>
@@ -565,11 +611,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setShowEntryModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                className="btn-secondary text-xs"
               >
                 Cancel
               </button>
@@ -577,7 +623,7 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                 type="button"
                 onClick={() => handleSaveEntry(false)}
                 disabled={submitting}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+                className="btn-primary text-xs flex items-center gap-2"
               >
                 {submitting ? 'Checking Constraints...' : 'Validate & Save'}
               </button>
