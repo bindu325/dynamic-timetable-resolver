@@ -61,6 +61,22 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// Root welcoming / status page for browser visits
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Dynamic Timetable Conflict Resolver API',
+    status: 'ONLINE',
+    version: '1.0.0',
+    documentation: {
+      health: '/api/health',
+      auth: '/api/auth/login',
+      dashboard: '/api/dashboard/stats',
+    },
+    message: 'Backend API is running. Access the frontend interface to interact with the system.',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Dynamic Health Check endpoint (Public)
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
