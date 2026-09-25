@@ -289,8 +289,12 @@ const resolveConflictsForEntry = async ({
   // Sort descending by score
   candidates.sort((a, b) => b.score - a.score);
 
+  // If there are valid solutions on the same day as the conflict, prioritize them exclusively
+  const sameDayCandidates = candidates.filter((c) => c.day === entryToChange.day);
+  const finalCandidates = sameDayCandidates.length > 0 ? sameDayCandidates : candidates;
+
   // Return top 10 best feasible alternatives
-  return candidates.slice(0, 10);
+  return finalCandidates.slice(0, 10);
 };
 
 /**
