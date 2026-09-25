@@ -79,10 +79,27 @@ const resolveConflictsForEntry = async ({
     : allRooms.filter((r) => getIdStr(r) === getIdStr(entryToChange.room));
 
   // Candidate faculties to test
+  // Filter only faculty members who teach classes to the SAME SECTION (for different subjects)
   let candidateFaculties = [facultyDoc].filter(Boolean);
   if (preferences.allowFacultyChange !== false && allFaculties && allFaculties.length > 0) {
-    // Check faculty who are available; all institution faculty are candidate substitutes
-    candidateFaculties = allFaculties;
+    const sectionIdStr = getIdStr(sectionDoc || entryToChange.section);
+    
+    // Find all faculty IDs already teaching any subject to this section
+    const sectionFacultyIds = new Set(
+      allEntries
+        .filter((e) => getIdStr(e.section) === sectionIdStr)
+        .map((e) => getIdStr(e.faculty))
+        .filter(Boolean)
+    );
+
+    // Get the matching faculty documents who teach this section
+    const sectionFaculties = allFaculties.filter((f) => sectionFacultyIds.has(getIdStr(f)));
+
+    if (sectionFaculties.length > 0) {
+      candidateFaculties = sectionFaculties;
+    } else {
+      candidateFaculties = allFaculties;
+    }
   }
 
   // Iterate over all permutations
