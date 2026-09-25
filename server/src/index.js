@@ -61,30 +61,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// API Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/faculty', require('./routes/facultyRoutes'));
-app.use('/api/sections', require('./routes/sectionRoutes'));
-app.use('/api/subjects', require('./routes/subjectRoutes'));
-app.use('/api/rooms', require('./routes/roomRoutes'));
-app.use('/api/time-slots', require('./routes/timeSlotRoutes'));
-app.use('/api/timetable', require('./routes/timetableRoutes'));
-app.use('/api/conflicts', require('./routes/resolverRoutes'));
-app.use('/api/resolver', require('./routes/resolverRoutes'));
-app.use('/api', require('./routes/analyticsRoutes'));
-app.use('/api/history', require('./routes/historyRoutes'));
-
-// Endpoint for manual database reset/reseed (useful for testing/demo)
-app.post('/api/seed', async (req, res) => {
-  try {
-    await seedDatabase();
-    res.json({ success: true, message: 'Database seeded with demo data successfully!' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Seeding failed', error: err.message });
-  }
-});
-
-// Dynamic Health Check endpoint reflecting real MongoDB connection status
+// Dynamic Health Check endpoint (Public)
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
   // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
@@ -103,6 +80,29 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Endpoint for manual database reset/reseed (Public utility for demo setup)
+app.post('/api/seed', async (req, res) => {
+  try {
+    await seedDatabase();
+    res.json({ success: true, message: 'Database seeded with demo data successfully!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Seeding failed', error: err.message });
+  }
+});
+
+// API Sub-Routers
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/faculty', require('./routes/facultyRoutes'));
+app.use('/api/sections', require('./routes/sectionRoutes'));
+app.use('/api/subjects', require('./routes/subjectRoutes'));
+app.use('/api/rooms', require('./routes/roomRoutes'));
+app.use('/api/time-slots', require('./routes/timeSlotRoutes'));
+app.use('/api/timetable', require('./routes/timetableRoutes'));
+app.use('/api/conflicts', require('./routes/resolverRoutes'));
+app.use('/api/resolver', require('./routes/resolverRoutes'));
+app.use('/api/history', require('./routes/historyRoutes'));
+app.use('/api', require('./routes/analyticsRoutes'));
 
 // Central error handler
 app.use(errorHandler);
