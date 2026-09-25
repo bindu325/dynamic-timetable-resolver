@@ -6,8 +6,8 @@ import { Sparkles, Lock, Mail, User, ShieldCheck, ArrowRight } from 'lucide-reac
 const LoginPage = ({ onSwitchToSignup }) => {
   const { login } = useAuth();
   const { success, error } = useToast();
-  const [email, setEmail] = useState('admin@college.edu');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
