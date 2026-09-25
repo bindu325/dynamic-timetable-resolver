@@ -81,21 +81,8 @@ const resolveConflictsForEntry = async ({
   // Candidate faculties to test
   let candidateFaculties = [facultyDoc].filter(Boolean);
   if (preferences.allowFacultyChange !== false && allFaculties && allFaculties.length > 0) {
-    const origSubjectId = getIdStr(subjectDoc || entryToChange.subject);
-    const origDept = subjectDoc?.department || facultyDoc?.department;
-
-    // Filter faculties who either teach this subject or are in the same department
-    const qualifiedFaculties = allFaculties.filter((f) => {
-      const teachesSubject = f.subjects && f.subjects.some((s) => getIdStr(s) === origSubjectId);
-      const sameDept = origDept ? f.department === origDept : true;
-      return teachesSubject || sameDept;
-    });
-
-    if (qualifiedFaculties.length > 0) {
-      candidateFaculties = qualifiedFaculties;
-    } else {
-      candidateFaculties = allFaculties;
-    }
+    // Check faculty who are available; all institution faculty are candidate substitutes
+    candidateFaculties = allFaculties;
   }
 
   // Iterate over all permutations
