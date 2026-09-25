@@ -146,11 +146,11 @@ const resolveConflictsForEntry = async ({
           const advantages = [];
           const warnings = [];
 
-          // Faculty & Time Slot matching priorities
+          // Same day & time preservation priorities (Exact Slot matching)
           const isExactDayAndTime = day === entryToChange.day && slot.startTime === entryToChange.startTime;
+          const isRoomSubstituted = getIdStr(room) !== getIdStr(entryToChange.room);
           
           if (isFacultySubstituted) {
-            // Finding an available faculty substitute for the exact time slot is the highest priority
             if (isExactDayAndTime) {
               score += 35;
               advantages.push(`Maintains original period (${entryToChange.day} ${entryToChange.startTime}-${entryToChange.endTime}) with substitute instructor: ${candidateFaculty.name}`);
@@ -159,25 +159,33 @@ const resolveConflictsForEntry = async ({
               advantages.push(`Faculty substitute: ${candidateFaculty.name} (${candidateFaculty.department || 'Qualified'})`);
             }
           } else {
-            // Retaining original instructor
             score += 10;
             advantages.push('Retains original instructor');
           }
 
-          // Advantage 1: Same room as requested
-          if (getIdStr(room) === getIdStr(entryToChange.room)) {
-            score += 10;
-            advantages.push('Keeps original preferred room');
-          } else {
-            advantages.push(`Alternative room: ${room.roomNumber} (${room.roomType}, Cap: ${room.capacity})`);
-          }
-
-          // Advantage 2: Same day as requested
-          if (day === entryToChange.day) {
+          // Room Allocation & Same Period Priorities:
+          // If the original room is occupied, allocating a vacant available room on the EXACT SAME DAY & PERIOD is top priority (#1)
+          if (isExactDayAndTime) {
+            score += 40;
+            if (isRoomSubstituted) {
+              advantages.push(`Maintains scheduled period (${entryToChange.day} ${entryToChange.startTime}-${entryToChange.endTime}) with vacant room: ${room.roomNumber} (${room.roomType}, Cap: ${room.capacity})`);
+            } else {
+              advantages.push('Maintains original scheduled slot and room');
+            }
+          } else if (day === entryToChange.day) {
             score += 15;
             advantages.push('Maintains original scheduled day');
           } else {
+            score -= 20; // Penalize moving to another day when the same period could be resolved with an alternative room
             advantages.push(`Moved to ${day}`);
+          }
+
+          // Room details
+          if (!isRoomSubstituted) {
+            score += 10;
+            advantages.push('Keeps original preferred room');
+          } else if (!isExactDayAndTime) {
+            advantages.push(`Alternative room: ${room.roomNumber} (${room.roomType}, Cap: ${room.capacity})`);
           }
 
           // Advantage 3: Candidate Faculty Preferred Time Slot Check

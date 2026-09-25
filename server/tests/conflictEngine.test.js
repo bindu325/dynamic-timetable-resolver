@@ -175,7 +175,35 @@ console.log('✓ Faculty un-availability constraint accurately detected.');
     (alt) => alt.day === 'Monday' && alt.startTime === '09:00' && alt.faculty._id === 'fac_2'
   );
   assert.strictEqual(foundSubstituteAtSameSlot, true, 'Should find substitute faculty for same time slot');
-  console.log('✓ Faculty substitution on same conflicting slot verified.');
+  // Test 8: Vacant room allocation on exact same day and period
+  const conflictingEntryRoomOnly = {
+    _id: 'entry_conflicted_room',
+    day: 'Monday',
+    startTime: '09:00',
+    endTime: '10:00',
+    faculty: facultyB, // Faculty B is free at Monday 09:00-10:00
+    room: allRooms[0], // Room 1 is occupied by entry_1
+    section: { _id: 'sec_2', name: 'CSE-B', studentCount: 50 },
+    subject: { _id: 'sub_1', name: 'DSA', type: 'THEORY' },
+  };
+
+  const roomAlternatives = await resolveConflictsForEntry({
+    entryToChange: conflictingEntryRoomOnly,
+    allEntries: existingEntries, // Room 1 is occupied on Monday 09:00-10:00
+    allRooms,
+    allTimeSlots,
+    allFaculties: [facultyA, facultyB],
+    facultyDoc: facultyB,
+    sectionDoc: { _id: 'sec_2', name: 'CSE-B', studentCount: 50 },
+    subjectDoc: { _id: 'sub_1', name: 'DSA', type: 'THEORY', department: 'CSE' },
+    preferences: { allowDayChange: true, allowRoomChange: true, allowFacultyChange: false },
+  });
+
+  assert.ok(roomAlternatives.length > 0, 'Should find alternative room');
+  assert.strictEqual(roomAlternatives[0].day, 'Monday', 'Top choice must remain on the same day');
+  assert.strictEqual(roomAlternatives[0].startTime, '09:00', 'Top choice must remain in the same period');
+  assert.strictEqual(roomAlternatives[0].room._id, 'room_2', 'Top choice must be the vacant room_2');
+  console.log('✓ Vacant alternative room on same day & period verified as top recommendation.');
 
   console.log('✓ Resolver engine successfully generated and ranked feasible alternatives.');
   console.log('--- ALL BACKEND ENGINE TESTS PASSED (100% SUCCESS) ---');
