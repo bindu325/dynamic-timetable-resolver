@@ -121,11 +121,16 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
       });
 
       if (res.data.success) {
-        success('Faculty availability preferences updated! Re-validating conflicts...');
-        await API.post('/conflicts/check');
+        success('Faculty availability preferences updated!');
+        try {
+          await API.post('/conflicts/check');
+        } catch (checkErr) {
+          console.warn('Conflict re-scan notice:', checkErr);
+        }
       }
     } catch (err) {
-      error('Failed to save availability preferences');
+      const msg = err.response?.data?.message || err.message || 'Failed to save availability preferences';
+      error(msg);
     } finally {
       setSaving(false);
     }

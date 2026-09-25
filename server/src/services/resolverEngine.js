@@ -28,12 +28,14 @@ const resolveConflictsForEntry = async ({
   allEntries = [],
   allRooms = [],
   allTimeSlots = [],
+  allFaculties = [],
   facultyDoc = null,
   sectionDoc = null,
   subjectDoc = null,
   preferences = {
     allowDayChange: true,
     allowRoomChange: true,
+    allowFacultyChange: true,
     preferredDays: [],
   },
 }) => {
@@ -76,155 +78,198 @@ const resolveConflictsForEntry = async ({
     ? allRooms.filter((r) => r.available !== false)
     : allRooms.filter((r) => getIdStr(r) === getIdStr(entryToChange.room));
 
+  // Candidate faculties to test
+  let candidateFaculties = [facultyDoc].filter(Boolean);
+  if (preferences.allowFacultyChange !== false && allFaculties && allFaculties.length > 0) {
+    const origSubjectId = getIdStr(subjectDoc || entryToChange.subject);
+    const origDept = subjectDoc?.department || facultyDoc?.department;
+
+    // Filter faculties who either teach this subject or are in the same department
+    const qualifiedFaculties = allFaculties.filter((f) => {
+      const teachesSubject = f.subjects && f.subjects.some((s) => getIdStr(s) === origSubjectId);
+      const sameDept = origDept ? f.department === origDept : true;
+      return teachesSubject || sameDept;
+    });
+
+    if (qualifiedFaculties.length > 0) {
+      candidateFaculties = qualifiedFaculties;
+    } else {
+      candidateFaculties = allFaculties;
+    }
+  }
+
   // Iterate over all permutations
   for (const day of days) {
     for (const slot of standardSlots) {
       for (const room of candidateRooms) {
-        const proposedCandidate = {
-          _id: entryToChange._id,
-          academicYear: entryToChange.academicYear,
-          semester: entryToChange.semester,
-          section: entryToChange.section?._id || entryToChange.section,
-          subject: entryToChange.subject?._id || entryToChange.subject,
-          faculty: entryToChange.faculty?._id || entryToChange.faculty,
-          room: room._id,
-          day: day,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          periodNumber: slot.periodNumber || 1,
-        };
+        for (const candidateFaculty of candidateFaculties) {
+          const isFacultySubstituted = getIdStr(candidateFaculty) !== getIdStr(facultyDoc);
 
-        // Run Hard Validation
-        const hardErrors = validateCandidateEntry({
-          candidate: proposedCandidate,
-          existingEntries: backgroundEntries,
-          facultyDoc,
-          sectionDoc,
-          roomDoc: room,
-          subjectDoc,
-          ignoreEntryId: currentEntryId,
-        });
+          const proposedCandidate = {
+            _id: entryToChange._id,
+            academicYear: entryToChange.academicYear,
+            semester: entryToChange.semester,
+            section: entryToChange.section?._id || entryToChange.section,
+            subject: entryToChange.subject?._id || entryToChange.subject,
+            faculty: candidateFaculty._id,
+            room: room._id,
+            day: day,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            periodNumber: slot.periodNumber || 1,
+          };
 
-        const isHardViolated = hardErrors.some((e) => e.severity === 'ERROR');
+          // Run Hard Validation
+          const hardErrors = validateCandidateEntry({
+            candidate: proposedCandidate,
+            existingEntries: backgroundEntries,
+            facultyDoc: candidateFaculty,
+            sectionDoc,
+            roomDoc: room,
+            subjectDoc,
+            ignoreEntryId: currentEntryId,
+          });
 
-        if (isHardViolated) {
-          // Reject invalid candidate from suggested list
-          continue;
-        }
+          const isHardViolated = hardErrors.some((e) => e.severity === 'ERROR');
 
-        // Candidate passed all hard constraints! Calculate Soft Score
-        let score = 50; // Baseline for a valid solution
-        const advantages = [];
-        const warnings = [];
-
-        // Advantage 1: Same room as requested
-        if (getIdStr(room) === getIdStr(entryToChange.room)) {
-          score += 10;
-          advantages.push('Keeps original preferred room');
-        } else {
-          advantages.push(`Alternative room: ${room.roomNumber} (${room.roomType}, Cap: ${room.capacity})`);
-        }
-
-        // Advantage 2: Same day as requested
-        if (day === entryToChange.day) {
-          score += 15;
-          advantages.push('Maintains original scheduled day');
-        } else {
-          advantages.push(`Moved to ${day}`);
-        }
-
-        // Advantage 3: Faculty Preferred Time Slot Check
-        let facultyPreferred = false;
-        if (facultyDoc?.availability) {
-          const prefMatch = facultyDoc.availability.find(
-            (a) => a.day === day && a.startTime === slot.startTime && a.status === 'PREFERRED'
-          );
-          if (prefMatch) {
-            score += 20;
-            facultyPreferred = true;
-            advantages.push('Matches faculty preferred working slot');
+          if (isHardViolated) {
+            // Reject invalid candidate from suggested list
+            continue;
           }
-        }
-        if (facultyDoc?.preferredTimeSlots?.some((s) => s.includes(day) && s.includes(slot.startTime))) {
-          if (!facultyPreferred) {
-            score += 15;
-            advantages.push('Matches faculty listed preferred hours');
-          }
-        }
 
-        // Advantage 4: Room Type Match
-        if (subjectDoc?.type === 'LAB') {
-          if (room.roomType === 'LAB') {
-            score += 15;
-            advantages.push('Perfect lab facility match');
+          // Candidate passed all hard constraints! Calculate Soft Score
+          let score = 50; // Baseline for a valid solution
+          const advantages = [];
+          const warnings = [];
+
+          // Faculty & Time Slot matching priorities
+          const isExactDayAndTime = day === entryToChange.day && slot.startTime === entryToChange.startTime;
+          
+          if (isFacultySubstituted) {
+            // Finding an available faculty substitute for the exact time slot is the highest priority
+            if (isExactDayAndTime) {
+              score += 35;
+              advantages.push(`Maintains original period (${entryToChange.day} ${entryToChange.startTime}-${entryToChange.endTime}) with substitute instructor: ${candidateFaculty.name}`);
+            } else {
+              score += 15;
+              advantages.push(`Faculty substitute: ${candidateFaculty.name} (${candidateFaculty.department || 'Qualified'})`);
+            }
           } else {
-            score -= 10;
-            warnings.push('Lab course assigned to non-lab classroom');
+            // Retaining original instructor
+            score += 10;
+            advantages.push('Retains original instructor');
           }
-        } else if (room.roomType === 'CLASSROOM') {
-          score += 10;
-          advantages.push('Optimal classroom environment for theory lecture');
+
+          // Advantage 1: Same room as requested
+          if (getIdStr(room) === getIdStr(entryToChange.room)) {
+            score += 10;
+            advantages.push('Keeps original preferred room');
+          } else {
+            advantages.push(`Alternative room: ${room.roomNumber} (${room.roomType}, Cap: ${room.capacity})`);
+          }
+
+          // Advantage 2: Same day as requested
+          if (day === entryToChange.day) {
+            score += 15;
+            advantages.push('Maintains original scheduled day');
+          } else {
+            advantages.push(`Moved to ${day}`);
+          }
+
+          // Advantage 3: Candidate Faculty Preferred Time Slot Check
+          let facultyPreferred = false;
+          if (candidateFaculty?.availability) {
+            const prefMatch = candidateFaculty.availability.find(
+              (a) => a.day === day && a.startTime === slot.startTime && a.status === 'PREFERRED'
+            );
+            if (prefMatch) {
+              score += 20;
+              facultyPreferred = true;
+              advantages.push('Matches faculty preferred working slot');
+            }
+          }
+          if (candidateFaculty?.preferredTimeSlots?.some((s) => s.includes(day) && s.includes(slot.startTime))) {
+            if (!facultyPreferred) {
+              score += 15;
+              advantages.push('Matches faculty listed preferred hours');
+            }
+          }
+
+          // Advantage 4: Room Type Match
+          if (subjectDoc?.type === 'LAB') {
+            if (room.roomType === 'LAB') {
+              score += 15;
+              advantages.push('Perfect lab facility match');
+            } else {
+              score -= 10;
+              warnings.push('Lab course assigned to non-lab classroom');
+            }
+          } else if (room.roomType === 'CLASSROOM') {
+            score += 10;
+            advantages.push('Optimal classroom environment for theory lecture');
+          }
+
+          // Advantage 5: Capacity Efficiency
+          const studentCount = sectionDoc?.studentCount || 40;
+          const capacityRatio = studentCount / (room.capacity || 1);
+          if (capacityRatio >= 0.6 && capacityRatio <= 0.95) {
+            score += 10;
+            advantages.push('Optimal seat utilization (60%-95% room fullness)');
+          } else if (capacityRatio < 0.4) {
+            score -= 5;
+            warnings.push(`Room capacity (${room.capacity}) is much larger than section size (${studentCount})`);
+          }
+
+          // Advantage 6: Section workload compactness
+          // Check if section already has class right before or after this slot on the same day
+          const adjacentClass = backgroundEntries.find((e) => {
+            if (getIdStr(e.section) !== getIdStr(sectionDoc)) return false;
+            if (e.day !== day) return false;
+            return e.endTime === slot.startTime || e.startTime === slot.endTime;
+          });
+
+          if (adjacentClass) {
+            score += 10;
+            advantages.push('Creates a continuous class block (no idle gap for students)');
+          }
+
+          // Cap score at 100
+          const finalScore = Math.min(100, Math.max(10, score));
+
+          candidates.push({
+            candidate: proposedCandidate,
+            day,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            periodNumber: slot.periodNumber || 1,
+            room: {
+              _id: room._id,
+              roomNumber: room.roomNumber,
+              building: room.building,
+              capacity: room.capacity,
+              roomType: room.roomType,
+            },
+            faculty: {
+              _id: candidateFaculty?._id,
+              name: candidateFaculty?.name,
+              department: candidateFaculty?.department,
+            },
+            section: {
+              _id: sectionDoc?._id,
+              name: sectionDoc?.name,
+            },
+            subject: {
+              _id: subjectDoc?._id,
+              name: subjectDoc?.name,
+              code: subjectDoc?.code,
+            },
+            score: finalScore,
+            hardConstraintsPassed: true,
+            advantages,
+            warnings,
+            explanation: `Score ${finalScore}/100: ${advantages.slice(0, 3).join(', ')}`,
+          });
         }
-
-        // Advantage 5: Capacity Efficiency
-        const studentCount = sectionDoc?.studentCount || 40;
-        const capacityRatio = studentCount / (room.capacity || 1);
-        if (capacityRatio >= 0.6 && capacityRatio <= 0.95) {
-          score += 10;
-          advantages.push('Optimal seat utilization (60%-95% room fullness)');
-        } else if (capacityRatio < 0.4) {
-          score -= 5;
-          warnings.push(`Room capacity (${room.capacity}) is much larger than section size (${studentCount})`);
-        }
-
-        // Advantage 6: Section workload compactness
-        // Check if section already has class right before or after this slot on the same day
-        const adjacentClass = backgroundEntries.find((e) => {
-          if (getIdStr(e.section) !== getIdStr(sectionDoc)) return false;
-          if (e.day !== day) return false;
-          return e.endTime === slot.startTime || e.startTime === slot.endTime;
-        });
-
-        if (adjacentClass) {
-          score += 10;
-          advantages.push('Creates a continuous class block (no idle gap for students)');
-        }
-
-        // Cap score at 100
-        const finalScore = Math.min(100, Math.max(10, score));
-
-        candidates.push({
-          candidate: proposedCandidate,
-          day,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          periodNumber: slot.periodNumber || 1,
-          room: {
-            _id: room._id,
-            roomNumber: room.roomNumber,
-            building: room.building,
-            capacity: room.capacity,
-            roomType: room.roomType,
-          },
-          faculty: {
-            _id: facultyDoc?._id,
-            name: facultyDoc?.name,
-          },
-          section: {
-            _id: sectionDoc?._id,
-            name: sectionDoc?.name,
-          },
-          subject: {
-            _id: subjectDoc?._id,
-            name: subjectDoc?.name,
-            code: subjectDoc?.code,
-          },
-          score: finalScore,
-          hardConstraintsPassed: true,
-          advantages,
-          warnings,
-          explanation: `Score ${finalScore}/100: ${advantages.slice(0, 3).join(', ')}`,
-        });
       }
     }
   }

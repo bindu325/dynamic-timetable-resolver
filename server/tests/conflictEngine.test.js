@@ -145,6 +145,38 @@ console.log('✓ Faculty un-availability constraint accurately detected.');
     );
   }
 
+  // Test 7: Faculty Substitution for exact conflicting period
+  const facultyB = { _id: 'fac_2', name: 'Prof. Ramesh', department: 'CSE', subjects: ['sub_1'] };
+  const conflictingEntryFacultyOnly = {
+    _id: 'entry_conflicted_2',
+    day: 'Monday',
+    startTime: '09:00',
+    endTime: '10:00',
+    faculty: facultyA,
+    room: allRooms[1],
+    section: { _id: 'sec_2', name: 'CSE-B', studentCount: 50 },
+    subject: { _id: 'sub_1', name: 'DSA', type: 'THEORY' },
+  };
+
+  const subAlternatives = await resolveConflictsForEntry({
+    entryToChange: conflictingEntryFacultyOnly,
+    allEntries: existingEntries, // Faculty A has class with sec_1 on Monday 09:00-10:00 in room_1
+    allRooms,
+    allTimeSlots,
+    allFaculties: [facultyA, facultyB],
+    facultyDoc: facultyA,
+    sectionDoc: { _id: 'sec_2', name: 'CSE-B', studentCount: 50 },
+    subjectDoc: { _id: 'sub_1', name: 'DSA', type: 'THEORY', department: 'CSE' },
+    preferences: { allowDayChange: false, allowRoomChange: true, allowFacultyChange: true },
+  });
+
+  assert.ok(subAlternatives.length > 0, 'Should find candidate with faculty substitute');
+  const foundSubstituteAtSameSlot = subAlternatives.some(
+    (alt) => alt.day === 'Monday' && alt.startTime === '09:00' && alt.faculty._id === 'fac_2'
+  );
+  assert.strictEqual(foundSubstituteAtSameSlot, true, 'Should find substitute faculty for same time slot');
+  console.log('✓ Faculty substitution on same conflicting slot verified.');
+
   console.log('✓ Resolver engine successfully generated and ranked feasible alternatives.');
   console.log('--- ALL BACKEND ENGINE TESTS PASSED (100% SUCCESS) ---');
 })();

@@ -34,6 +34,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   // Resolver Config Preferences
   const [allowDayChange, setAllowDayChange] = useState(true);
   const [allowRoomChange, setAllowRoomChange] = useState(true);
+  const [allowFacultyChange, setAllowFacultyChange] = useState(true);
 
   // Impact Simulation Modal State
   const [simulatedImpact, setSimulatedImpact] = useState(null);
@@ -95,13 +96,14 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
         preferences: {
           allowDayChange,
           allowRoomChange,
+          allowFacultyChange,
         },
       });
 
       if (res.data.success) {
         setAlternatives(res.data.data);
         if (res.data.data.length === 0) {
-          warning('No feasible slot found matching all hard constraints. Try enabling Day and Room changes.');
+          warning('No feasible slot found matching all hard constraints. Try enabling Day, Room, or Faculty changes.');
         } else {
           success(`Generated ${res.data.data.length} feasible, ranked alternatives!`);
         }
@@ -125,6 +127,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
           startTime: alt.startTime,
           endTime: alt.endTime,
           room: alt.room._id,
+          faculty: alt.faculty?._id,
         },
       });
 
@@ -223,6 +226,16 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                 className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
               />
               <span>Allow Room Reallocation</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer text-slate-700 hover:text-slate-900 font-medium">
+              <input
+                type="checkbox"
+                checked={allowFacultyChange}
+                onChange={(e) => setAllowFacultyChange(e.target.checked)}
+                className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+              />
+              <span>Allow Faculty Substitution (Free Faculty)</span>
             </label>
           </div>
         </div>

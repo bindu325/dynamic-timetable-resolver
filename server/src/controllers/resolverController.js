@@ -105,10 +105,11 @@ exports.suggestAlternatives = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Timetable entry not found' });
     }
 
-    const [allEntries, allRooms, allTimeSlots] = await Promise.all([
+    const [allEntries, allRooms, allTimeSlots, allFaculties] = await Promise.all([
       TimetableEntry.find({}),
       Room.find({}),
       TimeSlot.find({}),
+      Faculty.find({}),
     ]);
 
     const suggestions = await resolveConflictsForEntry({
@@ -116,10 +117,11 @@ exports.suggestAlternatives = async (req, res, next) => {
       allEntries,
       allRooms,
       allTimeSlots,
+      allFaculties,
       facultyDoc: entry.faculty,
       sectionDoc: entry.section,
       subjectDoc: entry.subject,
-      preferences: preferences || { allowDayChange: true, allowRoomChange: true },
+      preferences: preferences || { allowDayChange: true, allowRoomChange: true, allowFacultyChange: true },
     });
 
     res.status(200).json({
@@ -188,12 +190,15 @@ exports.applyResolution = async (req, res, next) => {
     const beforeState = entry.toObject();
 
     // Apply alternative updates
-    entry.day = alternative.day || alternative.candidate.day;
-    entry.startTime = alternative.startTime || alternative.candidate.startTime;
-    entry.endTime = alternative.endTime || alternative.candidate.endTime;
-    entry.periodNumber = alternative.periodNumber || alternative.candidate.periodNumber || entry.periodNumber;
+    entry.day = alternative.day || alternative.candidate?.day || entry.day;
+    entry.startTime = alternative.startTime || alternative.candidate?.startTime || entry.startTime;
+    entry.endTime = alternative.endTime || alternative.candidate?.endTime || entry.endTime;
+    entry.periodNumber = alternative.periodNumber || alternative.candidate?.periodNumber || entry.periodNumber;
     if (alternative.room?._id || alternative.candidate?.room) {
       entry.room = alternative.room?._id || alternative.candidate?.room;
+    }
+    if (alternative.faculty?._id || alternative.candidate?.faculty) {
+      entry.faculty = alternative.faculty?._id || alternative.candidate?.faculty;
     }
     entry.hasConflict = false;
     entry.conflictSummary = '';
@@ -201,6 +206,7 @@ exports.applyResolution = async (req, res, next) => {
     await entry.save();
 
     // Log to ChangeHistory
+    const facultyChanged = beforeState.faculty?.toString() !== entry.faculty.toString();
     await ChangeHistory.create({
       changedBy: req.user._id,
       changedByName: req.user.name,
@@ -209,7 +215,9 @@ exports.applyResolution = async (req, res, next) => {
       before: beforeState,
       after: entry.toObject(),
       reason: reason || `Conflict resolved using automated optimizer (Score: ${alternative.score || 'N/A'})`,
-      impactSummary: `Relocated from ${beforeState.day} ${beforeState.startTime}-${beforeState.endTime} to ${entry.day} ${entry.startTime}-${entry.endTime}`,
+      impactSummary: facultyChanged
+        ? `Reassigned instructor & adjusted to ${entry.day} ${entry.startTime}-${entry.endTime}`
+        : `Relocated from ${beforeState.day} ${beforeState.startTime}-${beforeState.endTime} to ${entry.day} ${entry.startTime}-${entry.endTime}`,
     });
 
     // Mark associated conflicts as RESOLVED

@@ -75,7 +75,8 @@ exports.updateFaculty = async (req, res, next) => {
     }
 
     // If role is FACULTY, can only update own availability
-    if (req.user.role === 'FACULTY' && req.user.facultyId?.toString() !== req.params.id) {
+    const userFacultyId = req.user.facultyId?._id ? req.user.facultyId._id.toString() : req.user.facultyId?.toString();
+    if (req.user.role === 'FACULTY' && userFacultyId !== req.params.id) {
       return res.status(403).json({ success: false, message: 'Faculty can only update their own profile' });
     }
 
