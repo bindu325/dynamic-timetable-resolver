@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound, CalendarDays, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound, CalendarDays, CheckCircle2, ArrowLeft } from 'lucide-react';
 
-const SignupPage = ({ onSwitchToLogin }) => {
+const SignupPage = ({ onSwitchToLogin, onBackToHome }) => {
   const { signup } = useAuth();
   const { success, error } = useToast();
   const [formData, setFormData] = useState({
@@ -36,13 +36,25 @@ const SignupPage = ({ onSwitchToLogin }) => {
           <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-black">
-                <CalendarDays className="w-5 h-5 text-slate-950" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-black">
+                  <CalendarDays className="w-5 h-5 text-slate-950" />
+                </div>
+                <span className="font-extrabold text-base tracking-tight text-white">
+                  Dynamic Timetable Resolver
+                </span>
               </div>
-              <span className="font-extrabold text-base tracking-tight text-white">
-                Dynamic Timetable Resolver
-              </span>
+
+              {onBackToHome && (
+                <button
+                  onClick={onBackToHome}
+                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-medium transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Home</span>
+                </button>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -61,33 +73,38 @@ const SignupPage = ({ onSwitchToLogin }) => {
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Personalized faculty availability matrices</span>
+                <span>Synchronized faculty availability matrices</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Instant automated conflict resolution telemetry</span>
+                <span>Instant automated conflict notifications</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-8 text-[11px] text-slate-500 font-medium">
-            Dynamic Timetable Resolver · Secure Operations
+          <div className="pt-8 text-slate-500 text-[11px] relative z-10">
+            Secure Authentication · Multi-Constraint Satisfaction Platform
           </div>
         </div>
 
         {/* Right Side: Signup Form */}
         <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center bg-white">
           <div className="max-w-md w-full mx-auto space-y-5">
-            <div>
-              <h3 className="text-xl font-bold text-slate-900 tracking-tight">Create your account</h3>
-              <p className="text-xs text-slate-500 mt-1">Fill in the profile details below to get started</p>
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">
+                Registration
+              </span>
+              <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Create new account
+              </h3>
+              <p className="text-xs text-slate-500">
+                Choose your designated role to initialize your workspace.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Full Name
-                </label>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Full Name</label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -95,16 +112,14 @@ const SignupPage = ({ onSwitchToLogin }) => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    placeholder="Prof. John Doe"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                    placeholder="Prof. Alan Turing"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all font-medium"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Email Address
-                </label>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Email Address</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -112,16 +127,14 @@ const SignupPage = ({ onSwitchToLogin }) => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    placeholder="john.doe@college.edu"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                    placeholder="alan.turing@college.edu"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all font-medium"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Password
-                </label>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Password</label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -129,44 +142,43 @@ const SignupPage = ({ onSwitchToLogin }) => {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
-                    minLength={6}
-                    placeholder="At least 6 characters"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all"
+                    placeholder="••••••••"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all font-medium"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Account Role
-                </label>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Account Role</label>
                 <div className="relative">
                   <Shield className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-all cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                   >
-                    <option value="VIEWER">Viewer (Student / Observer)</option>
-                    <option value="FACULTY">Faculty Member</option>
-                    <option value="ADMIN">System Administrator</option>
+                    <option value="VIEWER">Student / Viewer</option>
+                    <option value="FACULTY">Faculty Instructor</option>
+                    <option value="ADMIN">Academic Administrator</option>
                   </select>
                 </div>
               </div>
 
               {formData.role === 'ADMIN' && (
-                <div className="p-3 bg-teal-50 border border-teal-200 rounded-xl space-y-1.5">
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-teal-900">
-                    <KeyRound className="w-3.5 h-3.5 text-teal-700" />
-                    Admin Passkey (enter "ADMIN_2026")
+                <div className="space-y-1 animate-in fade-in">
+                  <label className="block text-xs font-semibold text-amber-700">
+                    Administrator Passkey Secret
                   </label>
-                  <input
-                    type="password"
-                    value={formData.adminSecret}
-                    onChange={(e) => setFormData({ ...formData, adminSecret: e.target.value })}
-                    placeholder="ADMIN_2026"
-                    className="w-full bg-white border border-teal-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-teal-600"
-                  />
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      value={formData.adminSecret}
+                      onChange={(e) => setFormData({ ...formData, adminSecret: e.target.value })}
+                      placeholder="admin-secret-2025"
+                      className="w-full bg-amber-50/50 border border-amber-200 rounded-xl pl-10 pr-4 py-2 text-xs text-amber-900 placeholder-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 font-mono"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -187,12 +199,12 @@ const SignupPage = ({ onSwitchToLogin }) => {
             </form>
 
             <p className="text-center text-xs text-slate-500 font-medium pt-2">
-              Already have an account?{' '}
+              Already registered?{' '}
               <button
                 onClick={onSwitchToLogin}
                 className="text-teal-700 hover:text-teal-800 font-bold underline underline-offset-4 ml-1 cursor-pointer"
               >
-                Sign in here
+                Sign in
               </button>
             </p>
           </div>

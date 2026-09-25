@@ -6,6 +6,7 @@ import API from './services/api';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar';
 
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
@@ -25,7 +26,7 @@ function App() {
   const { user, token, loading } = useAuth();
   const { success, warning, error } = useToast();
 
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
+  const [authMode, setAuthMode] = useState('landing'); // 'landing' | 'login' | 'signup'
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -96,12 +97,30 @@ function App() {
     );
   }
 
-  // Not authenticated
+  // Not authenticated flows
   if (!token || !user) {
-    if (authMode === 'signup') {
-      return <SignupPage onSwitchToLogin={() => setAuthMode('login')} />;
+    if (authMode === 'landing') {
+      return (
+        <LandingPage
+          onGetStarted={() => setAuthMode('login')}
+          onViewTimetable={() => setAuthMode('login')}
+        />
+      );
     }
-    return <LoginPage onSwitchToSignup={() => setAuthMode('signup')} />;
+    if (authMode === 'signup') {
+      return (
+        <SignupPage
+          onSwitchToLogin={() => setAuthMode('login')}
+          onBackToHome={() => setAuthMode('landing')}
+        />
+      );
+    }
+    return (
+      <LoginPage
+        onSwitchToSignup={() => setAuthMode('signup')}
+        onBackToHome={() => setAuthMode('landing')}
+      />
+    );
   }
 
   return (
