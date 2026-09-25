@@ -289,9 +289,20 @@ const resolveConflictsForEntry = async ({
   // Sort descending by score
   candidates.sort((a, b) => b.score - a.score);
 
-  // If there are valid solutions on the same day as the conflict, prioritize them exclusively
+  // 1. If valid solutions exist on the EXACT same day and time period (e.g. by allocating a substitute faculty or vacant room), prioritize them exclusively
+  const exactSlotCandidates = candidates.filter(
+    (c) => c.day === entryToChange.day && c.startTime === entryToChange.startTime
+  );
+  
+  // 2. Otherwise prioritize same-day solutions
   const sameDayCandidates = candidates.filter((c) => c.day === entryToChange.day);
-  const finalCandidates = sameDayCandidates.length > 0 ? sameDayCandidates : candidates;
+  
+  const finalCandidates =
+    exactSlotCandidates.length > 0
+      ? exactSlotCandidates
+      : sameDayCandidates.length > 0
+      ? sameDayCandidates
+      : candidates;
 
   // Return top 10 best feasible alternatives
   return finalCandidates.slice(0, 10);
