@@ -259,7 +259,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                           key={sub._id || sub}
                           className="px-2 py-0.5 rounded text-[10px] font-medium bg-teal-50 border border-teal-200/60 text-teal-800"
                         >
-                          No subjects assigned
+                          {sub.name || sub.code || sub}
                         </span>
                       ))
                     ) : (
@@ -267,6 +267,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                     )}
                   </div>
                 </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-100 text-xs">
@@ -297,8 +298,8 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                   </div>
                 )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
 

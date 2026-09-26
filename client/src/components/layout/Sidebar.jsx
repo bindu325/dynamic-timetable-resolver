@@ -118,20 +118,11 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
               </div>
             </div>
           ) : (
-            <div className="w-8 h-8 mx-auto rounded-lg bg-teal-100 text-teal-800 font-bold text-xs flex items-center justify-center border border-teal-200">
+            <div className="w-8 h-8 mx-auto rounded-lg bg-teal-100 text-teal-800 font-bold text-xs flex items-center justify-center border border-teal-200" title={user?.name || 'Guest'}>
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                {user?.name || 'Guest User'}
-              </span>
-              <span className="text-[10px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                <ShieldCheck className="w-2.5 h-2.5" style={{ color: 'var(--indigo-light)' }} />
-                {userRole}
-              </span>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Navigation Groups */}
         <nav className="p-3 space-y-4 overflow-y-auto max-h-[calc(100vh-230px)]">

@@ -132,23 +132,7 @@ const HistoryPage = () => {
                         {record.before.day || 'N/A'} {record.before.startTime ? `${record.before.startTime}-${record.before.endTime}` : ''}
                       </span>
                     </div>
-                    <span
-                      className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-                      style={{
-                        background: style.bg,
-                        border: `1px solid ${style.border}`,
-                        color: style.color,
-                      }}
-                    >
-                      {record.changeType.replace(/_/g, " ")}
-                    </span>
-                    <span
-                      className="text-xs font-medium"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {record.reason}
-                    </span>
-                  </div>
+                  )}
 
                   {record.before && record.after && (
                     <ArrowRight className="w-3.5 h-3.5 text-teal-600 shrink-0" />
@@ -163,6 +147,7 @@ const HistoryPage = () => {
                     </div>
                   )}
                 </div>
+              )}
 
               <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
                 <span className="flex items-center gap-1">
@@ -172,20 +157,9 @@ const HistoryPage = () => {
                 {record.impactSummary && (
                   <span className="text-teal-700 font-medium">({record.impactSummary})</span>
                 )}
-
-                <div
-                  className="flex items-center gap-1.5 text-[11px]"
-                  style={{ color: "var(--text-faint)" }}
-                >
-                  <User className="w-3 h-3" />
-                  <span>By: {record.changedByName || record.changedBy?.name || "Administrator"}</span>
-                  {record.impactSummary && (
-                    <span style={{ color: "#a5b4fc" }}>· {record.impactSummary}</span>
-                  )}
-                </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
