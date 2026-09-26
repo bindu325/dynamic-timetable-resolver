@@ -250,7 +250,6 @@ const RoomsPage = () => {
                     <span className="font-bold text-slate-900">{room.capacity} Seats</span>
                   </div>
 
-                  {/* Utilization Progress Bar */}
                   <div>
                     <div className="flex items-center justify-between text-[11px] mb-1">
                       <span className="text-slate-400 font-medium">Weekly Utilization:</span>
@@ -272,7 +271,6 @@ const RoomsPage = () => {
                     </div>
                   </div>
 
-                  {/* Equipment List */}
                   {room.equipment && room.equipment.length > 0 && (
                     <div className="pt-1">
                       <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">
@@ -437,3 +435,4 @@ const RoomsPage = () => {
 };
 
 export default RoomsPage;
+

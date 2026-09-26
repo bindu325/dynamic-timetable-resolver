@@ -1,5 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
+/* ============================================================
+   DESIGN TOKENS — Deep Navy 3D SaaS Theme
+   ============================================================ */
+:root {
+  /* Base Palette */
+  --navy-950:   #040812;
+  --navy-900:   #070d1e;
+  --navy-800:   #0a1228;
+  --navy-700:   #0f1a35;
+  --navy-600:   #162240;
+  --navy-500:   #1e2d52;
+
+  /* Surface System */
+  --bg-base:       var(--navy-900);
+  --bg-elevated:   rgba(15, 26, 53, 0.90);
+  --bg-raised:     rgba(22, 34, 64, 0.85);
+  --bg-surface:    rgba(15, 26, 53, 0.75);
+  --bg-overlay:    rgba(10, 18, 40, 0.96);
+
+  /* Glass System */
+  --glass-bg:          rgba(15, 26, 53, 0.65);
+  --glass-bg-light:    rgba(30, 45, 82, 0.45);
+  --glass-border:      rgba(79, 70, 229, 0.18);
+  --glass-border-hover:rgba(99, 91, 255, 0.35);
+  --glass-highlight:   rgba(255, 255, 255, 0.04);
+
+  /* Border System */
+  --border-subtle:  rgba(79, 70, 229, 0.10);
+  --border-default: rgba(79, 70, 229, 0.18);
+  --border-strong:  rgba(79, 70, 229, 0.35);
+  --border-accent:  rgba(79, 70, 229, 0.60);
+
+  /* Text System — 100% contrast on dark navy */
+  --text-primary:   #ffffff;
+  --text-secondary: #d4deff;
+  --text-muted:     #9aabcc;
+  --text-faint:     #5e74a8;
+  --text-inverted:  #040812;
+
+  /* Accent — Electric Indigo */
+  --indigo:         #4f46e5;
+  --indigo-light:   #6366f1;
+  --indigo-hover:   #5b52f0;
+  --indigo-subtle:  rgba(79, 70, 229, 0.14);
+  --indigo-glow:    rgba(79, 70, 229, 0.30);
+
+  /* Secondary Accent — Silver/Steel */
+  --silver:         #94a3b8;
+  --silver-subtle:  rgba(148, 163, 184, 0.10);
+
+  /* Semantic Colors */
+  --success:        #10b981;
+  --success-bg:     rgba(16, 185, 129, 0.10);
+  --success-border: rgba(16, 185, 129, 0.25);
+  --warning:        #f59e0b;
+  --warning-bg:     rgba(245, 158, 11, 0.10);
+  --warning-border: rgba(245, 158, 11, 0.25);
+  --error:          #ef4444;
+  --error-bg:       rgba(239, 68, 68, 0.10);
+  --error-border:   rgba(239, 68, 68, 0.25);
+  --info:           #06b6d4;
+  --info-bg:        rgba(6, 182, 212, 0.10);
+
+  /* 3D Shadow System — top-left light source */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.40);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-md:  0 4px 20px rgba(0,0,0,0.50), 0 2px 6px rgba(0,0,0,0.35);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.40);
+  --shadow-xl:  0 16px 64px rgba(0,0,0,0.60), 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-3d:  0 4px 0 rgba(0,0,0,0.30), 0 8px 30px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.25);
+  --shadow-indigo: 0 4px 24px rgba(79,70,229,0.30), 0 8px 48px rgba(79,70,229,0.15);
+  --shadow-inset: inset 0 1px 3px rgba(0,0,0,0.50), inset 0 0 0 1px rgba(255,255,255,0.03);
+
+  /* Border Radius */
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   14px;
+  --r-xl:   18px;
+  --r-2xl:  24px;
+  --r-3xl:  32px;
+  --r-full: 9999px;
+
+  /* Easing */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================
+   BASE RESET & TYPOGRAPHY
+   ============================================================ */
 @layer base {
   :root {
     --bg-primary: #F8FAFC;
@@ -249,7 +341,6 @@
   background: #CBD5E1;
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }

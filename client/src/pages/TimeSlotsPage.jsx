@@ -155,7 +155,6 @@ const TimeSlotsPage = () => {
                   <span className="text-[11px] text-slate-500 font-medium">{slot.day}</span>
                 </div>
               </div>
-
               {isAdmin && (
                 <button
                   onClick={() => handleDelete(slot._id)}
@@ -261,3 +260,4 @@ const TimeSlotsPage = () => {
 };
 
 export default TimeSlotsPage;
+

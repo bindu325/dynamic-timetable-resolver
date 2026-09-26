@@ -50,14 +50,16 @@ const Navbar = ({ onQuickScan, activeConflictCount = 0, isScanning = false, acti
           </div>
         )}
 
+        {/* Quick Scan Button */}
         {isAdmin && (
           <button
+            id="navbar-scan-btn"
             onClick={onQuickScan}
             disabled={isScanning}
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all disabled:opacity-50 cursor-pointer active:scale-98"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-            <span>{isScanning ? 'Scanning...' : 'Scan Conflicts'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? "animate-spin" : ""}`} />
+            <span>{isScanning ? "Scanning…" : "Scan"}</span>
           </button>
         )}
       </div>

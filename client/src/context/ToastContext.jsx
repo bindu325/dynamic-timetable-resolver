@@ -54,7 +54,7 @@ export const ToastProvider = ({ children }) => {
               onClick={() => removeToast(toast.id)}
               className="text-slate-400 hover:text-slate-700 transition-colors p-1"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}

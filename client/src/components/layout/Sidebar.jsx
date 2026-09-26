@@ -2,7 +2,7 @@ import React from 'react';
 import {
   LayoutDashboard,
   Calendar,
-  Sparkles,
+  Zap,
   Users,
   GraduationCap,
   BookOpen,
@@ -63,6 +63,12 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
       className={`fixed top-0 left-0 h-screen z-40 bg-white border-r border-slate-200 flex flex-col justify-between transition-all duration-300 shadow-xs ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
+      style={{
+        background: 'rgba(7, 13, 30, 0.92)',
+        backdropFilter: 'blur(24px) saturate(1.4)',
+        borderRight: '1px solid rgba(79, 70, 229, 0.18)',
+        boxShadow: '4px 0 40px rgba(0,0,0,0.50), inset -1px 0 0 rgba(79,70,229,0.08)',
+      }}
     >
       {/* Top Header */}
       <div>
@@ -92,7 +98,7 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
             className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
           </button>
         </div>
 
@@ -115,8 +121,17 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
             <div className="w-8 h-8 mx-auto rounded-lg bg-teal-100 text-teal-800 font-bold text-xs flex items-center justify-center border border-teal-200">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-          )}
-        </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                {user?.name || 'Guest User'}
+              </span>
+              <span className="text-[10px] flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                <ShieldCheck className="w-2.5 h-2.5" style={{ color: 'var(--indigo-light)' }} />
+                {userRole}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Navigation Groups */}
         <nav className="p-3 space-y-4 overflow-y-auto max-h-[calc(100vh-230px)]">
@@ -165,7 +180,18 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all cursor-pointer ${
             isCollapsed ? 'justify-center px-0' : ''
           }`}
-          title={isCollapsed ? 'Logout' : undefined}
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(239,68,68,0.10)';
+            e.currentTarget.style.color = '#fca5a5';
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.20)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'transparent';
+          }}
+          title={isCollapsed ? 'Sign Out' : undefined}
         >
           <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
           {!isCollapsed && <span>Sign Out</span>}

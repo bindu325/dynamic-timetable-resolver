@@ -10,7 +10,10 @@ const {
 } = require('../controllers/timetableController');
 const { protect, authorize } = require('../middleware/auth');
 
+const { generateTimetable } = require('../controllers/generateController');
+
 router.get('/', getTimetableEntries);
+router.post('/generate', generateTimetable);
 router.get('/:id', getTimetableEntryById);
 
 // Admin-only modifying operations

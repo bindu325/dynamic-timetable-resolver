@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import API from '../services/api';
+import React, { useEffect, useState, useRef } from "react";
+import API from "../services/api";
 import {
   Users,
   GraduationCap,
@@ -9,9 +9,8 @@ import {
   AlertTriangle,
   Percent,
   CheckCircle2,
-  TrendingUp,
   Clock,
-  Sparkles,
+  Zap,
   ArrowUpRight,
   Activity,
   Layers,
@@ -28,7 +27,7 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-} from 'recharts';
+} from "recharts";
 
 const DashboardPage = ({ setActiveTab }) => {
   const [stats, setStats] = useState(null);
@@ -36,20 +35,16 @@ const DashboardPage = ({ setActiveTab }) => {
 
   const fetchStats = async () => {
     try {
-      const res = await API.get('/dashboard/stats');
-      if (res.data.success) {
-        setStats(res.data.data);
-      }
+      const res = await API.get("/dashboard/stats");
+      if (res.data.success) setStats(res.data.data);
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
+      console.error("Error fetching dashboard stats:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchStats(); }, []);
 
   if (loading) {
     return (
@@ -71,7 +66,7 @@ const DashboardPage = ({ setActiveTab }) => {
     { title: 'Rooms & Labs', count: stats?.totalRooms || 0, subtitle: 'Physical spaces', icon: DoorClosed, path: 'rooms' },
     { title: 'Scheduled Periods', count: stats?.totalEntries || 0, subtitle: 'Active sessions', icon: Calendar, path: 'timetable' },
     {
-      title: 'Active Conflicts',
+      title: "Conflicts",
       count: stats?.activeConflicts || 0,
       subtitle: stats?.activeConflicts > 0 ? 'Requires attention' : 'Zero clashes',
       icon: AlertTriangle,
@@ -79,6 +74,8 @@ const DashboardPage = ({ setActiveTab }) => {
       highlight: stats?.activeConflicts > 0,
     },
   ];
+
+  const hasConflicts = (stats?.activeConflicts || 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -207,7 +204,6 @@ const DashboardPage = ({ setActiveTab }) => {
             >
               {stats?.activeConflicts === 0 ? 'Optimal (0 Conflicts)' : `${stats?.activeConflicts} Action Required`}
             </div>
-            <span className="text-[11px] text-slate-400">Autonomous validator active</span>
           </div>
         </div>
       </div>
@@ -224,7 +220,7 @@ const DashboardPage = ({ setActiveTab }) => {
               <Activity className="w-4 h-4 text-slate-500" />
             </div>
           </div>
-          <div className="h-64">
+          <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats?.dayDistribution || []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -249,9 +245,12 @@ const DashboardPage = ({ setActiveTab }) => {
               <Layers className="w-4 h-4 text-slate-500" />
             </div>
           </div>
-          <div className="h-64">
+          <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats?.classesByDepartment || []}>
+              <AreaChart
+                data={stats?.classesByDepartment || []}
+                margin={{ top: 4, right: 4, bottom: 0, left: -16 }}
+              >
                 <defs>
                   <linearGradient id="colorClasses" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#0284c7" stopOpacity={0.4} />

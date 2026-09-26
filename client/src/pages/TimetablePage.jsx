@@ -3,9 +3,6 @@ import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import {
-  Calendar,
-  Filter,
-  Plus,
   AlertTriangle,
   DoorClosed,
   User,
@@ -32,6 +29,8 @@ const DEFAULT_TIME_SLOTS = [
   { start: '15:00', end: '16:00', label: '15:00 - 16:00' },
 ];
 
+const DAY_ABBR = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat' };
+
 const TimetablePage = ({ onOpenResolverForEntry }) => {
   const { isAdmin, isFaculty, user } = useAuth();
   const { success, error, warning } = useToast();
@@ -43,13 +42,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedFaculty, setSelectedFaculty] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('ALL');
   const [selectedDay, setSelectedDay] = useState('ALL');
 
-  // Modal create/edit entry
   const [showEntryModal, setShowEntryModal] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
   const [entryForm, setEntryForm] = useState({
@@ -68,7 +65,6 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
   const [modalConflictWarning, setModalConflictWarning] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch initial data
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -78,7 +74,6 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
         API.get('/subjects'),
         API.get('/rooms'),
       ]);
-
       if (facRes.data.success) setFaculties(facRes.data.data);
       if (secRes.data.success) {
         setSections(secRes.data.data);
@@ -102,23 +97,15 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
       if (selectedFaculty && selectedFaculty !== 'ALL') params.faculty = selectedFaculty;
       if (selectedRoom && selectedRoom !== 'ALL') params.room = selectedRoom;
       if (selectedDay && selectedDay !== 'ALL') params.day = selectedDay;
-
       const res = await API.get('/timetable', { params });
-      if (res.data.success) {
-        setEntries(res.data.data);
-      }
+      if (res.data.success) setEntries(res.data.data);
     } catch (err) {
       console.error('Failed to fetch timetable entries:', err);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [selectedSection, selectedFaculty, selectedRoom, selectedDay]);
+  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchEntries(); }, [selectedSection, selectedFaculty, selectedRoom, selectedDay]);
 
   const handleOpenCreateModal = (day = 'Monday', startTime = '09:00', endTime = '10:00') => {
     setEditingEntry(null);
@@ -161,19 +148,18 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
   const handleSaveEntry = async (allowForce = false) => {
     setSubmitting(true);
     setModalConflictWarning(null);
-
     try {
       if (editingEntry) {
         const res = await API.put(`/timetable/${editingEntry._id}`, entryForm);
         if (res.data.success) {
-          success('Timetable entry updated successfully!');
+          success('Timetable entry updated!');
           setShowEntryModal(false);
           fetchEntries();
         }
       } else {
         const res = await API.post('/timetable', { ...entryForm, allowForce });
         if (res.data.success) {
-          success(res.data.message || 'Timetable entry added successfully!');
+          success(res.data.message || 'Timetable entry added!');
           setShowEntryModal(false);
           fetchEntries();
         }
@@ -194,11 +180,11 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
   };
 
   const handleDeleteEntry = async (entryId) => {
-    if (!window.confirm('Are you sure you want to remove this timetable entry?')) return;
+    if (!window.confirm('Remove this timetable entry?')) return;
     try {
       const res = await API.delete(`/timetable/${entryId}`);
       if (res.data.success) {
-        success('Timetable entry deleted successfully');
+        success('Entry deleted');
         fetchEntries();
       }
     } catch (err) {
@@ -464,7 +450,7 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
         </div>
       </div>
 
-      {/* Add / Edit Entry Modal */}
+      {/* Entry Modal */}
       {showEntryModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
@@ -481,11 +467,10 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                 onClick={() => setShowEntryModal(false)}
                 className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* In-Modal Conflict Alert */}
             {modalConflictWarning && (
               <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-2">
                 <div className="flex items-center gap-2 font-bold text-rose-800">
@@ -499,7 +484,7 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                     onClick={() => handleSaveEntry(true)}
                     className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs transition-colors"
                   >
-                    Force Save Anyway
+                    Force Save
                   </button>
                   <button
                     type="button"
@@ -625,7 +610,7 @@ const TimetablePage = ({ onOpenResolverForEntry }) => {
                 disabled={submitting}
                 className="btn-primary text-xs flex items-center gap-2"
               >
-                {submitting ? 'Checking Constraints...' : 'Validate & Save'}
+                {submitting ? 'Checking…' : 'Validate & Save'}
               </button>
             </div>
           </div>

@@ -21,6 +21,8 @@ import TimeSlotsPage from './pages/TimeSlotsPage';
 import HistoryPage from './pages/HistoryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ExportPage from './pages/ExportPage';
+import CreateTimetablePage from './pages/CreateTimetablePage';
+import Fluid3DBackground from './components/layout/Fluid3DBackground';
 
 function App() {
   const { user, token, loading } = useAuth();
@@ -135,8 +137,8 @@ function App() {
 
       {/* Main App Content Area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          isSidebarCollapsed ? 'ml-20' : 'ml-64'
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 relative z-10 ${
+          isSidebarCollapsed ? 'ml-[68px]' : 'ml-60'
         }`}
       >
         <Navbar
@@ -148,6 +150,7 @@ function App() {
 
         <main className="p-6 sm:p-8 flex-1 max-w-7xl w-full mx-auto">
           {activeTab === 'dashboard' && <DashboardPage setActiveTab={setActiveTab} />}
+          {activeTab === 'create-timetable' && <CreateTimetablePage setActiveTab={setActiveTab} />}
           {activeTab === 'timetable' && (
             <TimetablePage onOpenResolverForEntry={handleOpenResolverForEntry} />
           )}

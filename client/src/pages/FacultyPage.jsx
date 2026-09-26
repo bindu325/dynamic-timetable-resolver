@@ -18,6 +18,20 @@ import {
   BookOpen,
 } from 'lucide-react';
 
+const DEPT_COLORS = {
+  CSE:   { bg: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.25)", color: "#a5b4fc" },
+  ECE:   { bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.22)", color: "#6ee7b7" },
+  MECH:  { bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.22)", color: "#fcd34d" },
+  CIVIL: { bg: "rgba(239,68,68,0.10)",  border: "rgba(239,68,68,0.22)",  color: "#fca5a5" },
+  EEE:   { bg: "rgba(6,182,212,0.10)",  border: "rgba(6,182,212,0.22)",  color: "#67e8f9" },
+};
+
+const getDeptStyle = (dept) => DEPT_COLORS[dept] || {
+  bg: "rgba(79,70,229,0.10)",
+  border: "rgba(79,70,229,0.20)",
+  color: "#a5b4fc",
+};
+
 const FacultyPage = ({ onConfigureAvailability }) => {
   const { isAdmin } = useAuth();
   const { success, error } = useToast();
@@ -28,7 +42,6 @@ const FacultyPage = ({ onConfigureAvailability }) => {
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
 
-  // Modal
   const [showModal, setShowModal] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState(null);
   const [formData, setFormData] = useState({
@@ -47,12 +60,10 @@ const FacultyPage = ({ onConfigureAvailability }) => {
       const params = {};
       if (selectedDept !== 'ALL') params.department = selectedDept;
       if (search) params.search = search;
-
       const [facRes, subRes] = await Promise.all([
         API.get('/faculty', { params }),
         API.get('/subjects'),
       ]);
-
       if (facRes.data.success) setFaculties(facRes.data.data);
       if (subRes.data.success) setSubjects(subRes.data.data);
     } catch (err) {
@@ -62,9 +73,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
     }
   };
 
-  useEffect(() => {
-    fetchFaculties();
-  }, [selectedDept, search]);
+  useEffect(() => { fetchFaculties(); }, [selectedDept, search]);
 
   const handleOpenAdd = () => {
     setEditingFaculty(null);
@@ -101,7 +110,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
         success('Faculty updated successfully!');
       } else {
         await API.post('/faculty', formData);
-        success('Faculty member added successfully!');
+        success('Faculty member added!');
       }
       setShowModal(false);
       fetchFaculties();
@@ -113,10 +122,10 @@ const FacultyPage = ({ onConfigureAvailability }) => {
   };
 
   const handleDelete = async (id, force = false) => {
-    if (!window.confirm('Are you sure you want to delete this faculty member?')) return;
+    if (!window.confirm('Delete this faculty member?')) return;
     try {
       await API.delete(`/faculty/${id}${force ? '?force=true' : ''}`);
-      success('Faculty deleted successfully');
+      success('Faculty deleted');
       fetchFaculties();
     } catch (err) {
       if (err.response?.status === 400 && !force) {
@@ -134,7 +143,8 @@ const FacultyPage = ({ onConfigureAvailability }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 panel-enter-3d">
+
       {/* Header */}
       <div className="app-card p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -193,7 +203,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
         </div>
       </div>
 
-      {/* Faculty Cards Grid */}
+      {/* Faculty Cards */}
       {loading ? (
         <div className="app-card p-12 text-center text-xs text-slate-400">
           Loading faculty registry...
@@ -249,7 +259,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                           key={sub._id || sub}
                           className="px-2 py-0.5 rounded text-[10px] font-medium bg-teal-50 border border-teal-200/60 text-teal-800"
                         >
-                          {sub.code || sub.name || 'Subject'}
+                          No subjects assigned
                         </span>
                       ))
                     ) : (
@@ -257,7 +267,6 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                     )}
                   </div>
                 </div>
-              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-100 text-xs">
@@ -288,8 +297,8 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                   </div>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -334,7 +343,6 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                   />
                 </div>
-
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Department</label>
                   <select
@@ -346,6 +354,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                     <option value="ECE">ECE</option>
                     <option value="MECH">MECH</option>
                     <option value="CIVIL">CIVIL</option>
+                    <option value="EEE">EEE</option>
                   </select>
                 </div>
               </div>
@@ -387,7 +396,7 @@ const FacultyPage = ({ onConfigureAvailability }) => {
                   disabled={saving}
                   className="btn-primary text-xs"
                 >
-                  {saving ? 'Saving...' : 'Save Faculty'}
+                  {saving ? 'Saving…' : 'Save Faculty'}
                 </button>
               </div>
             </form>

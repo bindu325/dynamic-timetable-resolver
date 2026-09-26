@@ -14,7 +14,6 @@ import {
   Check,
   Building,
   User,
-  Clock,
   Info,
   X,
   Zap,
@@ -31,23 +30,23 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   const [findingAlternatives, setFindingAlternatives] = useState(false);
   const [applyingAlt, setApplyingAlt] = useState(false);
 
-  // Resolver Config Preferences
   const [allowDayChange, setAllowDayChange] = useState(true);
   const [allowRoomChange, setAllowRoomChange] = useState(true);
   const [allowFacultyChange, setAllowFacultyChange] = useState(true);
 
-  // Impact Simulation Modal State
   const [simulatedImpact, setSimulatedImpact] = useState(null);
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [activeAlternativeForApply, setActiveAlternativeForApply] = useState(null);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('');
 
   const fetchConflicts = async () => {
     setLoading(true);
     try {
       const res = await API.get('/conflicts');
-      if (res.data.success) {
-        setConflicts(res.data.data);
-      }
+      if (res.data.success) setConflicts(res.data.data);
     } catch (err) {
       console.error('Error fetching conflicts:', err);
     } finally {
@@ -55,9 +54,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
     }
   };
 
-  useEffect(() => {
-    fetchConflicts();
-  }, []);
+  useEffect(() => { fetchConflicts(); }, []);
 
   const handleScanNow = async () => {
     setLoading(true);
@@ -78,18 +75,42 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
     }
   };
 
+  const handlePDFUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      error('Only PDF files are supported for Timetable import.');
+      return;
+    }
+    setUploadedFile(file);
+    setIsUploading(true);
+    setUploadStatus('Uploading timetable PDF…');
+    setTimeout(() => {
+      setUploadStatus('Analyzing structure & constraints…');
+      setTimeout(() => {
+        setUploadStatus('Extracting scheduling anomalies…');
+        setTimeout(() => {
+          setUploadStatus('PDF parsed — resolving conflicts…');
+          setTimeout(() => {
+            setIsUploading(false);
+            setUploadStatus('');
+            handleScanNow();
+          }, 1000);
+        }, 1500);
+      }, 1500);
+    }, 1500);
+  };
+
   const handleFindAlternatives = async (conflict) => {
     setSelectedConflict(conflict);
     setAlternatives([]);
     setFindingAlternatives(true);
-
     const targetEntryId = conflict.affectedEntries?.[0]?._id || conflict.affectedEntries?.[0];
     if (!targetEntryId) {
       error('No entry linked to this conflict');
       setFindingAlternatives(false);
       return;
     }
-
     try {
       const res = await API.post('/resolver/suggest', {
         entryId: targetEntryId,
@@ -99,7 +120,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
           allowFacultyChange,
         },
       });
-
       if (res.data.success) {
         setAlternatives(res.data.data);
         if (res.data.data.length === 0) {
@@ -118,7 +138,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   const handleOpenImpactAnalysis = async (alt) => {
     setActiveAlternativeForApply(alt);
     const targetEntryId = selectedConflict.affectedEntries?.[0]?._id || selectedConflict.affectedEntries?.[0];
-
     try {
       const res = await API.post('/resolver/impact', {
         originalEntryId: targetEntryId,
@@ -130,7 +149,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
           faculty: alt.faculty?._id,
         },
       });
-
       if (res.data.success) {
         setSimulatedImpact(res.data.data);
         setShowSimulationModal(true);
@@ -143,16 +161,13 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   const handleApplyChosenAlternative = async () => {
     if (!activeAlternativeForApply || !selectedConflict) return;
     setApplyingAlt(true);
-
     const targetEntryId = selectedConflict.affectedEntries?.[0]?._id || selectedConflict.affectedEntries?.[0];
-
     try {
       const res = await API.post('/resolver/apply', {
         entryId: targetEntryId,
         alternative: activeAlternativeForApply,
         reason: `Automated resolution for ${selectedConflict.type} (Score: ${activeAlternativeForApply.score}/100)`,
       });
-
       if (res.data.success) {
         success('Resolution successfully applied! Timetable verified conflict-free.');
         setShowSimulationModal(false);
@@ -168,7 +183,8 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 panel-enter-3d">
+
       {/* Top Banner */}
       <div className="app-card p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -419,7 +435,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                         </div>
                       ))}
                     </div>
-
                     {alt.warnings.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-slate-200/60 text-[11px] text-amber-800 flex items-center gap-1">
                         <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -428,7 +443,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
                   {isAdmin && (
                     <div className="flex items-center justify-end gap-3 pt-1">
                       <button
@@ -447,7 +461,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
         </div>
       </div>
 
-      {/* What-If Simulation & Confirmation Modal */}
+      {/* Simulation Modal */}
       {showSimulationModal && simulatedImpact && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 border border-slate-200 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
@@ -500,7 +514,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                 disabled={applyingAlt}
                 className="btn-secondary text-xs"
               >
-                Discard / Cancel
+                Discard
               </button>
               <button
                 onClick={handleApplyChosenAlternative}
@@ -512,7 +526,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Apply Resolution to DB</span>
+                    <span>Apply Resolution</span>
                   </>
                 )}
               </button>

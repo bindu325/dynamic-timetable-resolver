@@ -137,7 +137,7 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 panel-enter-3d">
       {/* Header */}
       <div className="app-card p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -283,3 +283,4 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
 };
 
 export default FacultyAvailabilityPage;
+

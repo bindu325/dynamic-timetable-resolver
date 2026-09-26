@@ -6,23 +6,51 @@ import { Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound, CalendarDays,
 const SignupPage = ({ onSwitchToLogin, onBackToHome }) => {
   const { signup } = useAuth();
   const { success, error } = useToast();
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'VIEWER',
-    adminSecret: '',
+    name: "",
+    email: "",
+    password: "",
+    role: "FACULTY",
   });
   const [loading, setLoading] = useState(false);
+
+  // Parallax Tilt Effect State
+  const cardRef = useRef(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const card = cardRef.current.getBoundingClientRect();
+    const centerX = card.left + card.width / 2;
+    const centerY = card.top + card.height / 2;
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    // Calculate rotation limits (max 10 degrees)
+    const rotateY = (mouseX / (card.width / 2)) * 10;
+    const rotateX = -(mouseY / (card.height / 2)) * 10;
+    
+    setRotation({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setRotation({ x: 0, y: 0 });
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signup(formData);
-      success('Account created successfully! Welcome.');
+      await register(formData);
+      success("Registration successful! Please login.");
+      onSwitchToLogin();
     } catch (err) {
-      error(err.message || 'Registration failed');
+      error(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }

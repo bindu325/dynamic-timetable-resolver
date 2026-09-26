@@ -10,14 +10,37 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Parallax Tilt Effect State
+  const cardRef = useRef(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const card = cardRef.current.getBoundingClientRect();
+    const centerX = card.left + card.width / 2;
+    const centerY = card.top + card.height / 2;
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    // Calculate rotation limits (max 10 degrees)
+    const rotateY = (mouseX / (card.width / 2)) * 10;
+    const rotateX = -(mouseY / (card.height / 2)) * 10;
+    
+    setRotation({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setRotation({ x: 0, y: 0 });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       await login(email, password);
-      success('Welcome back! Logged in successfully.');
+      success("Authentication Successful");
     } catch (err) {
-      error(err.message || 'Invalid credentials');
+      error(err.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
@@ -25,7 +48,7 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
 
   const handleQuickLogin = (roleEmail) => {
     setEmail(roleEmail);
-    setPassword('password123');
+    setPassword("password123");
   };
 
   return (

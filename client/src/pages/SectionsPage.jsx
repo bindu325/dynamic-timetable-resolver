@@ -236,7 +236,6 @@ const SectionsPage = () => {
                   </div>
                 </div>
               </div>
-
               {isAdmin && (
                 <div className="flex items-center justify-end gap-1 pt-3 mt-4 border-t border-slate-100">
                   <button
@@ -289,7 +288,6 @@ const SectionsPage = () => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                   />
                 </div>
-
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Department</label>
                   <select
@@ -304,7 +302,6 @@ const SectionsPage = () => {
                   </select>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Year</label>
@@ -317,7 +314,6 @@ const SectionsPage = () => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                   />
                 </div>
-
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Semester</label>
                   <input
@@ -330,7 +326,6 @@ const SectionsPage = () => {
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Student Capacity</label>
@@ -342,7 +337,6 @@ const SectionsPage = () => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
                   />
                 </div>
-
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">Academic Year</label>
                   <input
@@ -380,3 +374,4 @@ const SectionsPage = () => {
 };
 
 export default SectionsPage;
+

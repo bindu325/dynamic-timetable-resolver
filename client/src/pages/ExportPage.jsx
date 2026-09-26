@@ -26,7 +26,6 @@ const ExportPage = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters for targeted export
   const [exportType, setExportType] = useState('ALL');
   const [selectedTargetId, setSelectedTargetId] = useState('ALL');
 
@@ -40,11 +39,10 @@ const ExportPage = () => {
           API.get('/faculty'),
           API.get('/rooms'),
         ]);
-
-        if (entRes.data.success) setEntries(entRes.data.data);
+        if (entRes.data.success)  setEntries(entRes.data.data);
         if (confRes.data.success) setConflicts(confRes.data.data);
-        if (secRes.data.success) setSections(secRes.data.data);
-        if (facRes.data.success) setFaculties(facRes.data.data);
+        if (secRes.data.success)  setSections(secRes.data.data);
+        if (facRes.data.success)  setFaculties(facRes.data.data);
         if (roomRes.data.success) setRooms(roomRes.data.data);
       } catch (err) {
         console.error(err);
@@ -52,66 +50,45 @@ const ExportPage = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   const getFilteredEntries = () => {
-    if (exportType === 'SECTION' && selectedTargetId !== 'ALL') {
+    if (exportType === 'SECTION' && selectedTargetId !== 'ALL')
       return entries.filter((e) => e.section?._id === selectedTargetId || e.section === selectedTargetId);
-    }
-    if (exportType === 'FACULTY' && selectedTargetId !== 'ALL') {
+    if (exportType === 'FACULTY' && selectedTargetId !== 'ALL')
       return entries.filter((e) => e.faculty?._id === selectedTargetId || e.faculty === selectedTargetId);
-    }
-    if (exportType === 'ROOM' && selectedTargetId !== 'ALL') {
+    if (exportType === 'ROOM' && selectedTargetId !== 'ALL')
       return entries.filter((e) => e.room?._id === selectedTargetId || e.room === selectedTargetId);
-    }
     return entries;
   };
 
   const handleExportCSV = () => {
     try {
       const dataToExport = getFilteredEntries();
-      if (dataToExport.length === 0) {
-        error('No records found to export');
-        return;
-      }
-
+      if (dataToExport.length === 0) { error('No records found to export'); return; }
       const headers = ['Day', 'Start Time', 'End Time', 'Subject Code', 'Subject Name', 'Faculty', 'Room', 'Section', 'Status'];
       const rows = dataToExport.map((e) => [
-        `"${e.day}"`,
-        `"${e.startTime}"`,
-        `"${e.endTime}"`,
-        `"${e.subject?.code || ''}"`,
-        `"${e.subject?.name || ''}"`,
-        `"${e.faculty?.name || ''}"`,
-        `"${e.room?.roomNumber || ''}"`,
-        `"${e.section?.name || ''}"`,
-        `"${e.status || 'PUBLISHED'}"`,
+        `"${e.day}"`, `"${e.startTime}"`, `"${e.endTime}"`,
+        `"${e.subject?.code || ''}"`, `"${e.subject?.name || ''}"`,
+        `"${e.faculty?.name || ''}"`, `"${e.room?.roomNumber || ''}"`,
+        `"${e.section?.name || ''}"`, `"${e.status || 'PUBLISHED'}"`,
       ]);
-
       const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
       const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
+      link.setAttribute('href', encodeURI(csvContent));
       link.setAttribute('download', `timetable_export_${exportType.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      success('CSV export generated successfully!');
-    } catch (err) {
-      error('Failed to generate CSV');
-    }
+      success('CSV export generated!');
+    } catch (err) { error('Failed to generate CSV'); }
   };
 
   const handleExportPDF = () => {
     try {
       const dataToExport = getFilteredEntries();
-      if (dataToExport.length === 0) {
-        error('No records found to export');
-        return;
-      }
-
+      if (dataToExport.length === 0) { error('No records found to export'); return; }
       const doc = new jsPDF();
       doc.setFontSize(16);
       doc.setTextColor(15, 23, 42);
@@ -121,15 +98,10 @@ const ExportPage = () => {
       doc.text(`Generated on: ${new Date().toLocaleString()} | Scope: ${exportType}`, 14, 22);
 
       const tableData = dataToExport.map((e) => [
-        e.day,
-        `${e.startTime} - ${e.endTime}`,
-        e.subject?.code || '',
-        e.subject?.name || '',
-        e.faculty?.name || '',
-        e.room?.roomNumber || '',
-        e.section?.name || '',
+        e.day, `${e.startTime} - ${e.endTime}`,
+        e.subject?.code || '', e.subject?.name || '',
+        e.faculty?.name || '', e.room?.roomNumber || '', e.section?.name || '',
       ]);
-
       autoTable(doc, {
         head: [['Day', 'Time', 'Code', 'Subject', 'Faculty', 'Room', 'Section']],
         body: tableData,
@@ -138,22 +110,14 @@ const ExportPage = () => {
         headStyles: { fillColor: [13, 148, 136] },
         styles: { fontSize: 8 },
       });
-
       doc.save(`timetable_report_${exportType.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.pdf`);
-      success('PDF report created and downloaded!');
-    } catch (err) {
-      console.error(err);
-      error('Failed to generate PDF');
-    }
+      success('PDF report downloaded!');
+    } catch (err) { console.error(err); error('Failed to generate PDF'); }
   };
 
   const handleExportConflictReportPDF = () => {
     try {
-      if (conflicts.length === 0) {
-        error('No active conflicts to export');
-        return;
-      }
-
+      if (conflicts.length === 0) { error('No active conflicts to export'); return; }
       const doc = new jsPDF();
       doc.setFontSize(16);
       doc.setTextColor(225, 29, 72);
@@ -163,27 +127,55 @@ const ExportPage = () => {
       doc.text(`Generated on: ${new Date().toLocaleString()} | Total Collisions: ${conflicts.length}`, 14, 22);
 
       const tableData = conflicts.map((c) => [
-        c.type.replace(/_/g, ' '),
-        c.severity,
-        c.day ? `${c.day} ${c.timeSlot || ''}` : 'General',
-        c.message,
+        c.type.replace(/_/g, ' '), c.severity,
+        c.day ? `${c.day} ${c.timeSlot || ''}` : 'General', c.message,
       ]);
-
       autoTable(doc, {
-        head: [['Type', 'Severity', 'Day & Time', 'Explanation & Violations']],
+        head: [['Type', 'Severity', 'Day & Time', 'Details']],
         body: tableData,
         startY: 28,
         theme: 'striped',
         headStyles: { fillColor: [225, 29, 72] },
         styles: { fontSize: 8 },
       });
-
-      doc.save(`conflict_audit_report_${new Date().toISOString().slice(0, 10)}.pdf`);
+      doc.save(`conflict_audit_${new Date().toISOString().slice(0, 10)}.pdf`);
       success('Conflict Audit PDF downloaded!');
-    } catch (err) {
-      error('Failed to generate Conflict PDF');
-    }
+    } catch (err) { error('Failed to generate Conflict PDF'); }
   };
+
+  const scopeCards = [
+    {
+      id: 'ALL',
+      label: 'Complete Timetable',
+      sub: 'All periods and cohorts',
+      icon: Calendar,
+      color: "#a5b4fc",
+    },
+    {
+      id: 'SECTION',
+      label: 'Section-Wise',
+      sub: 'Targeted student cohort',
+      icon: GraduationCap,
+      color: "#67e8f9",
+      onClick: () => setSelectedTargetId(sections[0]?._id || 'ALL'),
+    },
+    {
+      id: 'FACULTY',
+      label: 'Faculty-Wise',
+      sub: 'Individual lecturer load',
+      icon: User,
+      color: "#fcd34d",
+      onClick: () => setSelectedTargetId(faculties[0]?._id || 'ALL'),
+    },
+    {
+      id: 'ROOM',
+      label: 'Room-Wise',
+      sub: 'Hall occupancy schedule',
+      icon: Building,
+      color: "#6ee7b7",
+      onClick: () => setSelectedTargetId(rooms[0]?._id || 'ALL'),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -277,7 +269,7 @@ const ExportPage = () => {
           </button>
         </div>
 
-        {/* Dynamic target selector */}
+        {/* Dynamic Target Selector */}
         {exportType !== 'ALL' && (
           <div className="pt-1 max-w-sm text-xs">
             <label className="block text-slate-700 font-semibold mb-1.5">

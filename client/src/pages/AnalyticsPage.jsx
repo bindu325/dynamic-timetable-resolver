@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import API from '../services/api';
+import React, { useState, useEffect } from "react";
+import API from "../services/api";
 import {
-  BarChart3,
   Percent,
   Flame,
   CheckCircle2,
@@ -23,7 +22,7 @@ import {
   Pie,
   Cell,
   Legend,
-} from 'recharts';
+} from "recharts";
 
 const COLORS = ['#e11d48', '#f59e0b', '#0d9488', '#6366f1', '#ec4899', '#10b981', '#3b82f6'];
 
@@ -33,10 +32,8 @@ const AnalyticsPage = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await API.get('/analytics');
-      if (res.data.success) {
-        setData(res.data.data);
-      }
+      const res = await API.get("/analytics");
+      if (res.data.success) setData(res.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -44,15 +41,52 @@ const AnalyticsPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
+  useEffect(() => { fetchAnalytics(); }, []);
 
   if (loading) {
     return <div className="app-card p-16 text-center text-xs text-slate-400">Loading comprehensive analytics...</div>;
   }
 
   const { summary, roomUtilizationData, facultyWorkloadData, sectionWorkloadData, conflictTypeChartData } = data || {};
+
+  const kpis = [
+    {
+      label: "Periods Scheduled",
+      value: summary?.totalPeriodsScheduled || 0,
+      sub: "Across all cohorts",
+      icon: Activity,
+      color: "#a5b4fc",
+      bgColor: "rgba(79,70,229,0.12)",
+      borderColor: "rgba(79,70,229,0.22)",
+    },
+    {
+      label: "Resolution Rate",
+      value: `${summary?.resolutionRate || 100}%`,
+      sub: `${summary?.resolvedConflicts || 0} auto-resolved`,
+      icon: CheckCircle2,
+      color: "#6ee7b7",
+      bgColor: "rgba(16,185,129,0.10)",
+      borderColor: "rgba(16,185,129,0.22)",
+    },
+    {
+      label: "Active Conflicts",
+      value: summary?.activeConflicts || 0,
+      sub: "Requires review",
+      icon: AlertTriangle,
+      color: (summary?.activeConflicts || 0) > 0 ? "#fca5a5" : "#6ee7b7",
+      bgColor: (summary?.activeConflicts || 0) > 0 ? "rgba(239,68,68,0.10)" : "rgba(16,185,129,0.10)",
+      borderColor: (summary?.activeConflicts || 0) > 0 ? "rgba(239,68,68,0.22)" : "rgba(16,185,129,0.22)",
+    },
+    {
+      label: "Active Facilities",
+      value: summary?.totalRooms || 0,
+      sub: "Halls & labs",
+      icon: DoorClosed,
+      color: "#94a3b8",
+      bgColor: "rgba(148,163,184,0.08)",
+      borderColor: "rgba(148,163,184,0.18)",
+    },
+  ];
 
   return (
     <div className="space-y-6">
