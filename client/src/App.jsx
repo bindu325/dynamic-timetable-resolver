@@ -20,6 +20,8 @@ import TimeSlotsPage from './pages/TimeSlotsPage';
 import HistoryPage from './pages/HistoryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ExportPage from './pages/ExportPage';
+import CreateTimetablePage from './pages/CreateTimetablePage';
+import Fluid3DBackground from './components/layout/Fluid3DBackground';
 
 function App() {
   const { user, token, loading } = useAuth();
@@ -85,11 +87,25 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-semibold tracking-wider uppercase">
-            Initializing Dynamic Resolver Engine...
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--bg-base)' }}
+      >
+        <div className="flex flex-col items-center gap-5">
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(145deg, #6366f1 0%, #4f46e5 100%)',
+              boxShadow: '0 3px 0 rgba(40,33,160,0.50), 0 8px 32px rgba(79,70,229,0.40)',
+            }}
+          >
+            <div className="spinner" style={{ width: '1.5rem', height: '1.5rem', borderColor: 'rgba(255,255,255,0.25)', borderTopColor: '#fff' }} />
+          </div>
+          <span
+            className="text-[11px] font-semibold tracking-widest uppercase"
+            style={{ color: 'var(--text-muted)', fontFamily: "'Inter', sans-serif" }}
+          >
+            Initializing…
           </span>
         </div>
       </div>
@@ -105,7 +121,23 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div
+      className="min-h-screen flex relative"
+      style={{
+        backgroundColor: "var(--bg-base)",
+        color: "var(--text-primary)",
+      }}
+    >
+      <Fluid3DBackground />
+      {/* Subtle noise texture overlay */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 60% at 80% 10%, rgba(79,70,229,0.07) 0%, transparent 70%), ' +
+            'radial-gradient(ellipse 40% 40% at 20% 90%, rgba(99,102,241,0.05) 0%, transparent 70%)',
+        }}
+      />
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -116,8 +148,8 @@ function App() {
 
       {/* Main App Content Area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          isSidebarCollapsed ? 'ml-20' : 'ml-64'
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 relative z-10 ${
+          isSidebarCollapsed ? 'ml-[68px]' : 'ml-60'
         }`}
       >
         <Navbar
@@ -126,8 +158,9 @@ function App() {
           isScanning={isScanning}
         />
 
-        <main className="p-6 flex-1 max-w-7xl w-full mx-auto">
+        <main className="p-6 flex-1 max-w-7xl w-full mx-auto page-enter" style={{ minHeight: 'calc(100vh - 56px)' }}>
           {activeTab === 'dashboard' && <DashboardPage setActiveTab={setActiveTab} />}
+          {activeTab === 'create-timetable' && <CreateTimetablePage setActiveTab={setActiveTab} />}
           {activeTab === 'timetable' && (
             <TimetablePage onOpenResolverForEntry={handleOpenResolverForEntry} />
           )}

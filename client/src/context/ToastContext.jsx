@@ -29,32 +29,46 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4">
+      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-0">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-2xl backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${
-              toast.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-100 glow-emerald'
-                : toast.type === 'error'
-                ? 'bg-rose-950/90 border-rose-500/30 text-rose-100 glow-rose'
-                : toast.type === 'warning'
-                ? 'bg-amber-950/90 border-amber-500/30 text-amber-100'
-                : 'bg-slate-900/90 border-slate-700 text-slate-100'
-            }`}
+            className="pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-xl"
+            style={{
+              background:
+                toast.type === 'success' ? 'rgba(18, 40, 22, 0.92)' :
+                toast.type === 'error'   ? 'rgba(40, 14, 12, 0.92)' :
+                toast.type === 'warning' ? 'rgba(40, 32, 10, 0.92)' :
+                                           'rgba(20, 22, 32, 0.92)',
+              border:
+                toast.type === 'success' ? '1px solid rgba(52,168,83,0.30)' :
+                toast.type === 'error'   ? '1px solid rgba(217,48,37,0.30)' :
+                toast.type === 'warning' ? '1px solid rgba(242,153,0,0.30)' :
+                                           '1px solid rgba(255,255,255,0.10)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.50)',
+              animation: 'pageFadeIn 0.22s ease both',
+            }}
           >
             <div className="shrink-0 mt-0.5">
-              {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-              {toast.type === 'error' && <XCircle className="w-5 h-5 text-rose-400" />}
-              {toast.type === 'warning' && <AlertTriangle className="w-5 h-5 text-amber-400" />}
-              {toast.type === 'info' && <Info className="w-5 h-5 text-sky-400" />}
+              {toast.type === 'success' && <CheckCircle2 className="w-4 h-4" style={{ color: '#4ade80' }} />}
+              {toast.type === 'error'   && <XCircle      className="w-4 h-4" style={{ color: '#f87171' }} />}
+              {toast.type === 'warning' && <AlertTriangle className="w-4 h-4" style={{ color: '#fbbf24' }} />}
+              {toast.type === 'info'    && <Info         className="w-4 h-4" style={{ color: '#e879f9' }} />}
             </div>
-            <div className="flex-1 text-sm font-medium leading-relaxed">{toast.message}</div>
+            <div
+              className="flex-1 text-xs font-medium leading-relaxed"
+              style={{ color: '#d4d7e3' }}
+            >
+              {toast.message}
+            </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-white transition-colors p-1"
+              className="transition-colors p-0.5 rounded"
+              style={{ color: '#3a3f50' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#9ba3b5'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#3a3f50'; }}
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}

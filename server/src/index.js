@@ -123,7 +123,7 @@ app.use('/api', require('./routes/analyticsRoutes'));
 // Central error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Connect to MongoDB Atlas BEFORE starting Express server
 const startServer = async () => {

@@ -1,32 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import API from '../services/api';
-import {
-  History,
-  Clock,
-  User,
-  ArrowRight,
-  Sparkles,
-  CheckCircle2,
-  Trash2,
-  PlusCircle,
-  Edit,
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import API from "../services/api";
+import { History, Clock, User, ArrowRight, CheckCircle2, Edit2, Trash2, Plus, RefreshCw } from "lucide-react";
 
 const HistoryPage = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState('ALL');
+  const [filterType, setFilterType] = useState("ALL");
 
   const fetchHistory = async () => {
     setLoading(true);
     try {
       const params = {};
-      if (filterType !== 'ALL') params.changeType = filterType;
-
-      const res = await API.get('/history', { params });
-      if (res.data.success) {
-        setHistory(res.data.data);
-      }
+      if (filterType !== "ALL") params.changeType = filterType;
+      const res = await API.get("/history", { params });
+      if (res.data.success) setHistory(res.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -34,122 +21,198 @@ const HistoryPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchHistory();
-  }, [filterType]);
+  useEffect(() => { fetchHistory(); }, [filterType]);
 
-  const getBadgeStyle = (type) => {
+  const getChangeStyle = (type) => {
     switch (type) {
-      case 'RESOLVE_CONFLICT':
-      case 'AUTO_RESOLVE':
-        return 'bg-emerald-950 text-emerald-300 border-emerald-500/30';
-      case 'CREATE':
-        return 'bg-indigo-950 text-indigo-300 border-indigo-500/30';
-      case 'UPDATE':
-        return 'bg-amber-950 text-amber-300 border-amber-500/30';
-      case 'DELETE':
-        return 'bg-rose-950 text-rose-300 border-rose-500/30';
+      case "RESOLVE_CONFLICT":
+      case "AUTO_RESOLVE":
+        return { color: "#6ee7b7", bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.25)", icon: CheckCircle2 };
+      case "CREATE":
+        return { color: "#a5b4fc", bg: "rgba(79,70,229,0.10)", border: "rgba(79,70,229,0.25)", icon: Plus };
+      case "UPDATE":
+        return { color: "#fcd34d", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)", icon: Edit2 };
+      case "DELETE":
+        return { color: "#fca5a5", bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.25)", icon: Trash2 };
       default:
-        return 'bg-slate-800 text-slate-300 border-slate-700';
+        return { color: "var(--text-muted)", bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.10)", icon: History };
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            Audit Trail
-          </span>
-          <h2 className="text-2xl font-bold text-white mt-0.5">Timetable Change History</h2>
-          <p className="text-xs text-slate-400">
-            Chronological audit log of automated conflict resolutions, manual edits, and schedule adjustments.
+    <div className="space-y-5 panel-enter-3d">
+
+      {/* Header */}
+      <div
+        className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(22, 34, 64, 0.80) 0%, rgba(10, 18, 40, 0.90) 100%)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: "30%",
+            height: "200%",
+            background: "radial-gradient(ellipse at 80% 50%, rgba(79,70,229,0.06) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div className="relative">
+          <span className="section-eyebrow">Audit Trail</span>
+          <h2
+            className="section-title mt-1"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            Change <span className="text-gradient-indigo">History</span>
+          </h2>
+          <p className="section-desc mt-1">
+            Chronological log of conflict resolutions, manual edits, and schedule adjustments.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400">Filter Change Type:</span>
+        <div className="flex items-center gap-2 shrink-0 relative">
+          <label className="input-label" style={{ whiteSpace: "nowrap" }}>Filter:</label>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+            className="input-field"
+            style={{ width: "auto", minWidth: "160px" }}
           >
-            <option value="ALL">All Actions</option>
-            <option value="RESOLVE_CONFLICT">Conflict Resolutions</option>
-            <option value="CREATE">Created Entries</option>
-            <option value="UPDATE">Manual Updates</option>
-            <option value="DELETE">Deleted Entries</option>
+            <option value="ALL">All actions</option>
+            <option value="RESOLVE_CONFLICT">Conflict resolutions</option>
+            <option value="CREATE">Created entries</option>
+            <option value="UPDATE">Manual updates</option>
+            <option value="DELETE">Deleted entries</option>
           </select>
         </div>
       </div>
 
+      {/* Content */}
       {loading ? (
-        <div className="text-center py-12 text-xs text-slate-400">Loading audit log...</div>
+        <div className="flex justify-center py-16">
+          <div className="spinner" />
+        </div>
       ) : history.length === 0 ? (
-        <div className="glass-card rounded-2xl p-12 text-center border border-slate-800 space-y-3">
-          <History className="w-10 h-10 mx-auto text-slate-600" />
-          <h4 className="text-sm font-semibold text-white">No Change History Recorded</h4>
-          <p className="text-xs text-slate-400">Modifications to schedules and resolutions will appear here.</p>
+        <div className="glass-card p-12 text-center space-y-3">
+          <div
+            className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+            style={{
+              background: "rgba(79,70,229,0.10)",
+              border: "1px solid rgba(79,70,229,0.22)",
+            }}
+          >
+            <History className="w-6 h-6" style={{ color: "#a5b4fc" }} />
+          </div>
+          <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+            No History Recorded
+          </p>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Schedule modifications and conflict resolutions will appear here.
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {history.map((record) => (
-            <div
-              key={record._id}
-              className="glass-card p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition-all space-y-2"
-            >
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${getBadgeStyle(record.changeType)}`}>
-                    {record.changeType.replace(/_/g, ' ')}
-                  </span>
-                  <span className="text-xs font-semibold text-white">
-                    {record.reason}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                  <Clock className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{new Date(record.timestamp || record.createdAt).toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Before vs After Context snippet */}
-              {(record.before || record.after) && (
-                <div className="text-xs text-slate-300 p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 flex items-center gap-3">
-                  {record.before && (
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                      <span className="text-rose-400 font-medium">Prior:</span>
-                      <span>
-                        {record.before.day || 'N/A'} {record.before.startTime ? `${record.before.startTime}-${record.before.endTime}` : ''}
-                      </span>
+        <div className="space-y-2.5">
+          {history.map((record) => {
+            const style = getChangeStyle(record.changeType);
+            const IconComp = style.icon;
+            return (
+              <div
+                key={record._id}
+                className="glass-card p-4 space-y-2.5 transition-all"
+                onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(79,70,229,0.30)"}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(79,70,229,0.18)"}
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2.5">
+                    {/* Type badge */}
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                      style={{
+                        background: style.bg,
+                        border: `1px solid ${style.border}`,
+                      }}
+                    >
+                      <IconComp className="w-3.5 h-3.5" style={{ color: style.color }} />
                     </div>
-                  )}
+                    <span
+                      className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                      style={{
+                        background: style.bg,
+                        border: `1px solid ${style.border}`,
+                        color: style.color,
+                      }}
+                    >
+                      {record.changeType.replace(/_/g, " ")}
+                    </span>
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {record.reason}
+                    </span>
+                  </div>
 
-                  {record.before && record.after && (
-                    <ArrowRight className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                  )}
-
-                  {record.after && (
-                    <div className="flex items-center gap-1.5 text-slate-200">
-                      <span className="text-emerald-400 font-medium">New:</span>
-                      <span>
-                        {record.after.day || 'N/A'} {record.after.startTime ? `${record.after.startTime}-${record.after.endTime}` : ''}
-                      </span>
-                    </div>
-                  )}
+                  <div
+                    className="flex items-center gap-1.5 text-[11px]"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    <Clock className="w-3 h-3" />
+                    <span>{new Date(record.timestamp || record.createdAt).toLocaleString()}</span>
+                  </div>
                 </div>
-              )}
 
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1">
-                <User className="w-3 h-3 text-slate-500" />
-                <span>Changed by: {record.changedByName || record.changedBy?.name || 'Administrator'}</span>
-                {record.impactSummary && (
-                  <span className="ml-2 text-indigo-400">({record.impactSummary})</span>
+                {(record.before || record.after) && (
+                  <div
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs"
+                    style={{
+                      background: "rgba(10,18,40,0.60)",
+                      border: "1px solid rgba(79,70,229,0.10)",
+                    }}
+                  >
+                    {record.before && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium" style={{ color: "#fca5a5" }}>Prior:</span>
+                        <span style={{ color: "var(--text-secondary)" }}>
+                          {record.before.day || "N/A"}{" "}
+                          {record.before.startTime
+                            ? `${record.before.startTime}–${record.before.endTime}`
+                            : ""}
+                        </span>
+                      </div>
+                    )}
+                    {record.before && record.after && (
+                      <ArrowRight className="w-3.5 h-3.5 shrink-0" style={{ color: "#a5b4fc" }} />
+                    )}
+                    {record.after && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium" style={{ color: "#6ee7b7" }}>New:</span>
+                        <span style={{ color: "var(--text-primary)" }}>
+                          {record.after.day || "N/A"}{" "}
+                          {record.after.startTime
+                            ? `${record.after.startTime}–${record.after.endTime}`
+                            : ""}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 )}
+
+                <div
+                  className="flex items-center gap-1.5 text-[11px]"
+                  style={{ color: "var(--text-faint)" }}
+                >
+                  <User className="w-3 h-3" />
+                  <span>By: {record.changedByName || record.changedBy?.name || "Administrator"}</span>
+                  {record.impactSummary && (
+                    <span style={{ color: "#a5b4fc" }}>· {record.impactSummary}</span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

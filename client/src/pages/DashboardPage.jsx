@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import API from '../services/api';
+import React, { useEffect, useState, useRef } from "react";
+import API from "../services/api";
 import {
   Users,
   GraduationCap,
@@ -9,12 +9,12 @@ import {
   AlertTriangle,
   Percent,
   CheckCircle2,
-  TrendingUp,
   Clock,
-  Sparkles,
+  Zap,
   ArrowUpRight,
   Flame,
-} from 'lucide-react';
+  TrendingUp,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -23,14 +23,77 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   AreaChart,
   Area,
-} from 'recharts';
+} from "recharts";
 
-const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4'];
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      className="px-3 py-2 rounded-xl text-xs"
+      style={{
+        background: "rgba(10, 18, 40, 0.96)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid rgba(79, 70, 229, 0.30)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.60)",
+        color: "var(--text-primary)",
+      }}
+    >
+      <div style={{ color: "var(--text-muted)" }} className="mb-1 text-[11px]">{label}</div>
+      <div className="font-bold text-indigo-300">{payload[0]?.value}</div>
+    </div>
+  );
+};
+
+const StatCard = ({ card, onClick }) => {
+  const Icon = card.icon;
+  return (
+    <div
+      onClick={onClick}
+      className="card-3d card-interactive p-5 cursor-pointer group"
+      style={
+        card.highlight
+          ? {
+              background: "linear-gradient(145deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.07) 100%)",
+              borderColor: "rgba(239,68,68,0.30)",
+            }
+          : {}
+      }
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center"
+          style={{
+            background: card.highlight
+              ? "rgba(239,68,68,0.12)"
+              : "rgba(79,70,229,0.12)",
+            border: `1px solid ${card.highlight ? "rgba(239,68,68,0.25)" : "rgba(79,70,229,0.22)"}`,
+          }}
+        >
+          <Icon
+            className="w-4 h-4"
+            style={{ color: card.highlight ? "#fca5a5" : "#a5b4fc" }}
+          />
+        </div>
+        <ArrowUpRight
+          className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ color: "var(--text-muted)" }}
+        />
+      </div>
+      <div
+        className="stat-number"
+        style={{ color: card.highlight ? "#fca5a5" : "var(--text-primary)" }}
+      >
+        {card.count}
+      </div>
+      <div className="stat-label mt-1">{card.title}</div>
+      <div className="text-[10px] mt-0.5" style={{ color: "var(--text-faint)" }}>
+        {card.unit}
+      </div>
+    </div>
+  );
+};
 
 const DashboardPage = ({ setActiveTab }) => {
   const [stats, setStats] = useState(null);
@@ -38,227 +101,314 @@ const DashboardPage = ({ setActiveTab }) => {
 
   const fetchStats = async () => {
     try {
-      const res = await API.get('/dashboard/stats');
-      if (res.data.success) {
-        setStats(res.data.data);
-      }
+      const res = await API.get("/dashboard/stats");
+      if (res.data.success) setStats(res.data.data);
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
+      console.error("Error fetching dashboard stats:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchStats(); }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-medium">Loading Dashboard Metrics...</span>
+        <div className="flex flex-col items-center gap-4">
+          <div className="spinner" />
+          <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+            Loading dashboard…
+          </span>
         </div>
       </div>
     );
   }
 
   const statCards = [
-    { title: 'Total Faculty', count: stats?.totalFaculty || 0, icon: Users, color: 'indigo', path: 'faculty' },
-    { title: 'Sections', count: stats?.totalSections || 0, icon: GraduationCap, color: 'sky', path: 'sections' },
-    { title: 'Subjects', count: stats?.totalSubjects || 0, icon: BookOpen, color: 'emerald', path: 'subjects' },
-    { title: 'Rooms & Labs', count: stats?.totalRooms || 0, icon: DoorClosed, color: 'purple', path: 'rooms' },
-    { title: 'Scheduled Periods', count: stats?.totalEntries || 0, icon: Calendar, color: 'amber', path: 'timetable' },
+    { title: "Faculty", count: stats?.totalFaculty || 0, icon: Users, path: "faculty", unit: "members" },
+    { title: "Sections", count: stats?.totalSections || 0, icon: GraduationCap, path: "sections", unit: "cohorts" },
+    { title: "Subjects", count: stats?.totalSubjects || 0, icon: BookOpen, path: "subjects", unit: "courses" },
+    { title: "Rooms", count: stats?.totalRooms || 0, icon: DoorClosed, path: "rooms", unit: "spaces" },
+    { title: "Periods", count: stats?.totalEntries || 0, icon: Calendar, path: "timetable", unit: "scheduled" },
     {
-      title: 'Active Conflicts',
+      title: "Conflicts",
       count: stats?.activeConflicts || 0,
       icon: AlertTriangle,
-      color: stats?.activeConflicts > 0 ? 'rose' : 'emerald',
-      path: 'resolver',
-      highlight: stats?.activeConflicts > 0,
+      path: "resolver",
+      unit: "active",
+      highlight: (stats?.activeConflicts || 0) > 0,
     },
   ];
 
+  const hasConflicts = (stats?.activeConflicts || 0) > 0;
+
   return (
-    <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-full bg-gradient-to-l from-indigo-600/10 to-transparent pointer-events-none" />
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+    <div className="space-y-5 panel-enter-3d">
+
+      {/* Animated Multi-Color Hero Banner */}
+      <div
+        className="glass-card p-8 overflow-hidden relative"
+        style={{
+          background: "linear-gradient(135deg, rgba(22, 34, 64, 0.65) 0%, rgba(10, 18, 40, 0.75) 100%)",
+          border: "1px solid rgba(139, 92, 246, 0.4)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)",
+        }}
+      >
+        {/* Animated Background Gradients */}
+        <div className="absolute inset-0 opacity-100 mix-blend-screen pointer-events-none"
+             style={{
+               background: "radial-gradient(circle at 20% 0%, rgba(99, 102, 241, 0.9) 0%, transparent 60%), radial-gradient(circle at 80% 100%, rgba(236, 72, 153, 0.9) 0%, transparent 60%), radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.6) 0%, transparent 70%)",
+             }}
+        />
+        <div className="absolute top-[-30%] right-[-10%] w-[32rem] h-[32rem] rounded-full blur-3xl opacity-90 pointer-events-none mix-blend-screen"
+             style={{ background: "linear-gradient(to right, #4f46e5, #ec4899)", animation: "spin 10s linear infinite" }} />
+        <div className="absolute bottom-[-30%] left-[-10%] w-[28rem] h-[28rem] rounded-full blur-3xl opacity-80 pointer-events-none mix-blend-screen"
+             style={{ background: "linear-gradient(to right, #10b981, #3b82f6)", animation: "spin 12s linear infinite reverse" }} />
+
+        <style>{`
+          @keyframes spin { 100% { transform: rotate(360deg); } }
+          .hero-text-gradient {
+            background: linear-gradient(to right, #ffffff 0%, #a5b4fc 50%, #f9a8d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+        `}</style>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-3"
+                  style={{ background: "rgba(255,255,255,0.1)", color: "#e0e7ff", border: "1px solid rgba(255,255,255,0.2)" }}>
               System Overview
             </span>
-            <h2 className="text-2xl font-bold text-white mt-1">
-              Dynamic Timetable Conflict Resolver
+            <h2
+              className="mt-1 font-bold leading-tight"
+              style={{ fontSize: "36px", fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Timetable <span className="hero-text-gradient">Conflict Resolver</span>
             </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Autonomous constraint validation, conflict detection, and multi-factor ranking optimizer.
+            <p className="mt-3 max-w-xl text-sm" style={{ color: "rgba(255,255,255,0.7)", lineHeight: "1.6" }}>
+              Autonomous constraint validation, conflict detection, and multi-factor resolution engine. Engineered for extreme efficiency.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
-              onClick={() => setActiveTab('resolver')}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/20 flex items-center gap-2 transition-all"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Launch Conflict Resolver</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('timetable')}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700 flex items-center gap-2 transition-all"
+              onClick={() => setActiveTab("timetable")}
+              className="btn btn-secondary"
             >
               <Calendar className="w-4 h-4" />
-              <span>View Timetable</span>
+              Timetable
+            </button>
+            <button
+              onClick={() => setActiveTab("resolver")}
+              className="btn btn-primary"
+            >
+              <Zap className="w-4 h-4" />
+              Resolve Conflicts
             </button>
           </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {statCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.title}
-              onClick={() => setActiveTab(card.path)}
-              className={`glass-card p-4 rounded-xl border transition-all cursor-pointer hover:-translate-y-0.5 ${
-                card.highlight
-                  ? 'border-rose-500/40 bg-rose-950/20 shadow-lg shadow-rose-950/50'
-                  : 'border-slate-800 hover:border-slate-700'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-medium text-slate-400">{card.title}</span>
-                <Icon
-                  className={`w-4 h-4 ${
-                    card.highlight ? 'text-rose-400 animate-bounce' : 'text-indigo-400'
-                  }`}
-                />
-              </div>
-              <div className="text-2xl font-bold text-white tracking-tight">{card.count}</div>
-              <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-400 hover:text-indigo-300">
-                <span>Manage</span>
-                <ArrowUpRight className="w-3 h-3" />
-              </div>
-            </div>
-          );
-        })}
+      {/* KPI Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {statCards.map((card) => (
+          <StatCard
+            key={card.title}
+            card={card}
+            onClick={() => setActiveTab(card.path)}
+          />
+        ))}
       </div>
 
-      {/* Quick Metrics Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass-card p-4 rounded-xl border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
-            <Percent className="w-6 h-6 text-indigo-400" />
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Room Utilization */}
+        <div className="glass-card p-4 flex items-start gap-3.5">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{
+              background: "rgba(79,70,229,0.12)",
+              border: "1px solid rgba(79,70,229,0.22)",
+              boxShadow: "0 2px 8px rgba(79,70,229,0.12)",
+            }}
+          >
+            <Percent className="w-5 h-5" style={{ color: "#a5b4fc" }} />
           </div>
-          <div>
-            <span className="text-xs text-slate-400">Average Room Utilization</span>
-            <div className="text-xl font-bold text-white mt-0.5">
-              {stats?.roomUtilization || 0}%
-            </div>
-            <div className="w-48 bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+          <div className="flex-1 min-w-0">
+            <div className="stat-label">Room Utilization</div>
+            <div className="stat-number mt-1">{stats?.roomUtilization || 0}%</div>
+            <div className="progress-bar mt-2">
               <div
-                className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+                className="progress-bar-fill"
                 style={{ width: `${stats?.roomUtilization || 0}%` }}
               />
             </div>
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-xl border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
-            <Flame className="w-6 h-6 text-violet-400" />
+        {/* Faculty Workload */}
+        <div className="glass-card p-4 flex items-start gap-3.5">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{
+              background: "rgba(16,185,129,0.10)",
+              border: "1px solid rgba(16,185,129,0.22)",
+            }}
+          >
+            <Flame className="w-5 h-5" style={{ color: "#6ee7b7" }} />
           </div>
-          <div>
-            <span className="text-xs text-slate-400">Avg Faculty Workload</span>
-            <div className="text-xl font-bold text-white mt-0.5">
-              {stats?.avgFacultyWorkload || 0} hrs/week
+          <div className="flex-1 min-w-0">
+            <div className="stat-label">Avg Faculty Workload</div>
+            <div className="stat-number mt-1">{stats?.avgFacultyWorkload || 0}</div>
+            <div className="text-[11px] mt-1" style={{ color: "var(--text-muted)" }}>
+              hrs/week · Target: 18–22 hrs
             </div>
-            <span className="text-[11px] text-slate-400">Target baseline: 18-22 hrs</span>
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-xl border border-slate-800 flex items-center gap-4">
+        {/* Integrity Status */}
+        <div className="glass-card p-4 flex items-start gap-3.5">
           <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
-              stats?.activeConflicts === 0
-                ? 'bg-emerald-500/10 border-emerald-500/20'
-                : 'bg-rose-500/10 border-rose-500/20'
-            }`}
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={
+              hasConflicts
+                ? { background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.22)" }
+                : { background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.22)" }
+            }
           >
-            {stats?.activeConflicts === 0 ? (
-              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+            {hasConflicts ? (
+              <AlertTriangle className="w-5 h-5" style={{ color: "#fca5a5" }} />
             ) : (
-              <AlertTriangle className="w-6 h-6 text-rose-400" />
+              <CheckCircle2 className="w-5 h-5" style={{ color: "#6ee7b7" }} />
             )}
           </div>
-          <div>
-            <span className="text-xs text-slate-400">Timetable Integrity State</span>
+          <div className="flex-1 min-w-0">
+            <div className="stat-label">Integrity Status</div>
             <div
-              className={`text-lg font-bold mt-0.5 ${
-                stats?.activeConflicts === 0 ? 'text-emerald-400' : 'text-rose-400'
-              }`}
+              className="text-base font-bold mt-1 leading-tight"
+              style={{
+                color: hasConflicts ? "#fca5a5" : "#6ee7b7",
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
             >
-              {stats?.activeConflicts === 0 ? 'Optimal & Conflict-Free' : `${stats?.activeConflicts} Action Required`}
+              {hasConflicts
+                ? `${stats?.activeConflicts} Issue${stats?.activeConflicts !== 1 ? "s" : ""} Found`
+                : "Conflict-Free"}
             </div>
-            <span className="text-[11px] text-slate-400">Autonomous validator active</span>
+            <div className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Autonomous validator active
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Recharts Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Timetable Distribution Chart */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-white">Weekly Class Distribution</h3>
-              <p className="text-xs text-slate-400">Periods scheduled per day across departments</p>
-            </div>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Weekly Distribution */}
+        <div className="glass-card p-5">
+          <div className="mb-4">
+            <h3
+              className="text-sm font-semibold"
+              style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Weekly Class Distribution
+            </h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Periods scheduled per day
+            </p>
           </div>
-          <div className="h-64">
+          <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats?.dayDistribution || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
+              <BarChart
+                data={stats?.dayDistribution || []}
+                margin={{ top: 4, right: 4, bottom: 0, left: -16 }}
+              >
+                <CartesianGrid strokeDasharray="2 4" stroke="rgba(79,70,229,0.08)" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  stroke="var(--text-faint)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "var(--text-muted)" }}
                 />
-                <Bar dataKey="classes" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <YAxis
+                  stroke="var(--text-faint)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "var(--text-muted)" }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar
+                  dataKey="classes"
+                  fill="url(#barGradient)"
+                  radius={[6, 6, 0, 0]}
+                  opacity={0.95}
+                />
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.85} />
+                  </linearGradient>
+                </defs>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Classes by Department Pie/Bar */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-white">Scheduled Load by Department</h3>
-              <p className="text-xs text-slate-400">Course volume breakdown</p>
-            </div>
+        {/* Department Load */}
+        <div className="glass-card p-5">
+          <div className="mb-4">
+            <h3
+              className="text-sm font-semibold"
+              style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Scheduled Load by Department
+            </h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Course volume breakdown
+            </p>
           </div>
-          <div className="h-64">
+          <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats?.classesByDepartment || []}>
+              <AreaChart
+                data={stats?.classesByDepartment || []}
+                margin={{ top: 4, right: 4, bottom: 0, left: -16 }}
+              >
                 <defs>
-                  <linearGradient id="colorClasses" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.40} />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="department" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
+                <CartesianGrid strokeDasharray="2 4" stroke="rgba(79,70,229,0.08)" vertical={false} />
+                <XAxis
+                  dataKey="department"
+                  stroke="var(--text-faint)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "var(--text-muted)" }}
                 />
-                <Area type="monotone" dataKey="classes" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorClasses)" />
+                <YAxis
+                  stroke="var(--text-faint)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "var(--text-muted)" }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Area
+                  type="monotone"
+                  dataKey="classes"
+                  stroke="#6366f1"
+                  strokeWidth={2.5}
+                  fill="url(#areaGradient)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>

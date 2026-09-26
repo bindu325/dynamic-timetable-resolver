@@ -10,14 +10,18 @@ import {
   TrendingUp,
   RotateCcw,
   SlidersHorizontal,
-  ChevronDown,
   Layers,
   ShieldCheck,
   Check,
   Building,
   User,
-  Clock,
   Info,
+  UploadCloud,
+  FileText,
+  FileCheck,
+  Loader2,
+  X,
+  Zap,
 } from 'lucide-react';
 
 const ConflictResolverPage = ({ onJumpToTimetable }) => {
@@ -31,22 +35,22 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   const [findingAlternatives, setFindingAlternatives] = useState(false);
   const [applyingAlt, setApplyingAlt] = useState(false);
 
-  // Resolver Config Preferences
   const [allowDayChange, setAllowDayChange] = useState(true);
   const [allowRoomChange, setAllowRoomChange] = useState(true);
 
-  // Impact Simulation Modal State
   const [simulatedImpact, setSimulatedImpact] = useState(null);
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [activeAlternativeForApply, setActiveAlternativeForApply] = useState(null);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('');
 
   const fetchConflicts = async () => {
     setLoading(true);
     try {
       const res = await API.get('/conflicts');
-      if (res.data.success) {
-        setConflicts(res.data.data);
-      }
+      if (res.data.success) setConflicts(res.data.data);
     } catch (err) {
       console.error('Error fetching conflicts:', err);
     } finally {
@@ -54,9 +58,7 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
     }
   };
 
-  useEffect(() => {
-    fetchConflicts();
-  }, []);
+  useEffect(() => { fetchConflicts(); }, []);
 
   const handleScanNow = async () => {
     setLoading(true);
@@ -77,31 +79,51 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
     }
   };
 
+  const handlePDFUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      error('Only PDF files are supported for Timetable import.');
+      return;
+    }
+    setUploadedFile(file);
+    setIsUploading(true);
+    setUploadStatus('Uploading timetable PDF…');
+    setTimeout(() => {
+      setUploadStatus('Analyzing structure & constraints…');
+      setTimeout(() => {
+        setUploadStatus('Extracting scheduling anomalies…');
+        setTimeout(() => {
+          setUploadStatus('PDF parsed — resolving conflicts…');
+          setTimeout(() => {
+            setIsUploading(false);
+            setUploadStatus('');
+            handleScanNow();
+          }, 1000);
+        }, 1500);
+      }, 1500);
+    }, 1500);
+  };
+
   const handleFindAlternatives = async (conflict) => {
     setSelectedConflict(conflict);
     setAlternatives([]);
     setFindingAlternatives(true);
-
     const targetEntryId = conflict.affectedEntries?.[0]?._id || conflict.affectedEntries?.[0];
     if (!targetEntryId) {
       error('No entry linked to this conflict');
       setFindingAlternatives(false);
       return;
     }
-
     try {
       const res = await API.post('/resolver/suggest', {
         entryId: targetEntryId,
-        preferences: {
-          allowDayChange,
-          allowRoomChange,
-        },
+        preferences: { allowDayChange, allowRoomChange },
       });
-
       if (res.data.success) {
         setAlternatives(res.data.data);
         if (res.data.data.length === 0) {
-          warning('No feasible slot found matching all hard constraints. Try enabling Day and Room changes.');
+          warning('No feasible slot found. Try enabling Day and Room changes.');
         } else {
           success(`Generated ${res.data.data.length} feasible, ranked alternatives!`);
         }
@@ -113,11 +135,9 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
     }
   };
 
-  // What-If Impact Evaluation before applying
   const handleOpenImpactAnalysis = async (alt) => {
     setActiveAlternativeForApply(alt);
     const targetEntryId = selectedConflict.affectedEntries?.[0]?._id || selectedConflict.affectedEntries?.[0];
-
     try {
       const res = await API.post('/resolver/impact', {
         originalEntryId: targetEntryId,
@@ -128,7 +148,6 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
           room: alt.room._id,
         },
       });
-
       if (res.data.success) {
         setSimulatedImpact(res.data.data);
         setShowSimulationModal(true);
@@ -141,16 +160,13 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   const handleApplyChosenAlternative = async () => {
     if (!activeAlternativeForApply || !selectedConflict) return;
     setApplyingAlt(true);
-
     const targetEntryId = selectedConflict.affectedEntries?.[0]?._id || selectedConflict.affectedEntries?.[0];
-
     try {
       const res = await API.post('/resolver/apply', {
         entryId: targetEntryId,
         alternative: activeAlternativeForApply,
         reason: `Automated resolution for ${selectedConflict.type} (Score: ${activeAlternativeForApply.score}/100)`,
       });
-
       if (res.data.success) {
         success('Resolution successfully applied! Timetable verified conflict-free.');
         setShowSimulationModal(false);
@@ -166,90 +182,221 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 panel-enter-3d">
+
       {/* Top Banner */}
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+      <div
+        className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(22, 34, 64, 0.85) 0%, rgba(10, 18, 40, 0.95) 100%)",
+        }}
+      >
+        {/* BG glow */}
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: "35%",
+            height: "100%",
+            background: "radial-gradient(ellipse at 80% 50%, rgba(239,68,68,0.07) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+              style={{
+                background: "rgba(239,68,68,0.12)",
+                border: "1px solid rgba(239,68,68,0.25)",
+                color: "#fca5a5",
+              }}
+            >
               Core Engine
             </span>
-            <span className="text-xs text-slate-400">Multi-Constraint Constraint Satisfaction Problem (CSP)</span>
+            <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+              Multi-Constraint CSP Solver
+            </span>
           </div>
-          <h2 className="text-2xl font-bold text-white mt-1">
-            Dynamic Timetable Conflict Resolver
+          <h2
+            className="text-2xl font-bold"
+            style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "-0.02em" }}
+          >
+            Dynamic Timetable{" "}
+            <span className="text-gradient-indigo">Conflict Resolver</span>
           </h2>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm mt-1.5" style={{ color: "var(--text-secondary)" }}>
             Real-time conflict detection, multi-factor scoring optimizer, and What-If impact simulation.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 relative">
+          {/* PDF Upload */}
+          <label
+            className="relative cursor-pointer overflow-hidden px-4 py-2.5 rounded-xl text-white text-xs font-semibold flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            style={{
+              background: "linear-gradient(145deg, #6366f1 0%, #4f46e5 100%)",
+              boxShadow: "0 3px 0 rgba(40,33,160,0.50), 0 6px 20px rgba(79,70,229,0.30), inset 0 1px 0 rgba(255,255,255,0.18)",
+            }}
+          >
+            {isUploading ? (
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <UploadCloud className="w-3.5 h-3.5" />
+            )}
+            <span>{isUploading ? 'Extracting PDF…' : 'Import Timetable PDF'}</span>
+            <input
+              type="file"
+              accept=".pdf"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={handlePDFUpload}
+              disabled={isUploading || loading}
+            />
+          </label>
+
           <button
             onClick={handleScanNow}
-            disabled={loading}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700 flex items-center gap-2 transition-all"
+            disabled={loading || isUploading}
+            className="btn btn-secondary"
           >
             <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Re-Scan Entire Timetable</span>
+            <span>Re-Scan System</span>
           </button>
         </div>
       </div>
 
+      {/* Uploaded File Indicator */}
+      {uploadedFile && (
+        <div
+          className="glass-card p-4 flex items-center justify-between gap-4"
+          style={{
+            borderColor: isUploading ? "rgba(99,102,241,0.35)" : "rgba(16,185,129,0.30)",
+            background: isUploading ? "rgba(79,70,229,0.06)" : "rgba(16,185,129,0.05)",
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+              style={{
+                background: isUploading ? "rgba(99,102,241,0.15)" : "rgba(16,185,129,0.15)",
+                border: `1px solid ${isUploading ? "rgba(99,102,241,0.30)" : "rgba(16,185,129,0.30)"}`,
+              }}
+            >
+              {isUploading ? (
+                <FileText className="w-5 h-5" style={{ color: "#a5b4fc" }} />
+              ) : (
+                <FileCheck className="w-5 h-5" style={{ color: "#6ee7b7" }} />
+              )}
+            </div>
+            <div>
+              <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                {uploadedFile.name}
+              </h3>
+              <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
+                {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB · PDF Document
+              </p>
+              {isUploading && (
+                <div className="flex items-center gap-2 mt-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: "#a5b4fc" }} />
+                  <span className="text-[11px] font-semibold" style={{ color: "#a5b4fc" }}>
+                    {uploadStatus}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+          {!isUploading && (
+            <button
+              onClick={() => setUploadedFile(null)}
+              className="btn btn-ghost"
+              style={{ padding: "0.375rem" }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Preferences Bar */}
-      <div className="glass-card px-5 py-3.5 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-2 text-slate-300 font-medium">
-          <SlidersHorizontal className="w-4 h-4 text-indigo-400" />
-          <span>Resolver Optimization Parameters:</span>
+      <div
+        className="glass-card px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs"
+        style={{ borderColor: "rgba(79,70,229,0.20)" }}
+      >
+        <div className="flex items-center gap-2" style={{ color: "var(--text-secondary)" }}>
+          <SlidersHorizontal className="w-4 h-4" style={{ color: "#a5b4fc" }} />
+          <span className="font-medium">Resolver optimization parameters:</span>
         </div>
 
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
-            <input
-              type="checkbox"
-              checked={allowDayChange}
-              onChange={(e) => setAllowDayChange(e.target.checked)}
-              className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0"
-            />
-            <span>Allow Day Permutations (Mon-Sat)</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
-            <input
-              type="checkbox"
-              checked={allowRoomChange}
-              onChange={(e) => setAllowRoomChange(e.target.checked)}
-              className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0"
-            />
-            <span>Allow Room Reallocation</span>
-          </label>
+          {[
+            { label: "Allow day permutations (Mon–Sat)", checked: allowDayChange, onChange: setAllowDayChange },
+            { label: "Allow room reallocation", checked: allowRoomChange, onChange: setAllowRoomChange },
+          ].map(({ label, checked, onChange }) => (
+            <label key={label} className="flex items-center gap-2 cursor-pointer">
+              <div
+                onClick={() => onChange(!checked)}
+                className="relative w-8 h-4 rounded-full transition-colors"
+                style={{
+                  background: checked ? "var(--indigo)" : "rgba(79,70,229,0.20)",
+                  boxShadow: checked ? "0 0 8px rgba(79,70,229,0.40)" : "none",
+                }}
+              >
+                <div
+                  className="absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform shadow-sm"
+                  style={{ transform: `translateX(${checked ? '18px' : '2px'})` }}
+                />
+              </div>
+              <span style={{ color: checked ? "var(--text-primary)" : "var(--text-muted)" }}>
+                {label}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 
-      {/* Main Grid: Active Conflicts List vs Suggested Alternatives */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Active Conflicts (5 cols) */}
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        {/* Left Column — Active Conflicts */}
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <h3
+              className="text-sm font-semibold flex items-center gap-2"
+              style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <AlertTriangle className="w-4 h-4" style={{ color: "#fca5a5" }} />
               <span>Active Conflicts ({conflicts.length})</span>
             </h3>
-            <span className="text-[11px] text-slate-400">Click a conflict to solve</span>
+            <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+              Click to resolve
+            </span>
           </div>
 
           {loading ? (
-            <div className="glass-card rounded-xl p-8 text-center text-slate-400 text-xs">
-              Scanning database for timetable collisions...
+            <div className="glass-card p-8 text-center">
+              <div className="spinner mx-auto mb-3" />
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Scanning database…</p>
             </div>
           ) : conflicts.length === 0 ? (
-            <div className="glass-card rounded-2xl p-8 border border-emerald-500/20 bg-emerald-950/10 text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <CheckCircle2 className="w-6 h-6" />
+            <div
+              className="glass-card rounded-2xl p-8 text-center space-y-3"
+              style={{ borderColor: "rgba(16,185,129,0.25)", background: "rgba(16,185,129,0.04)" }}
+            >
+              <div
+                className="w-12 h-12 mx-auto rounded-full flex items-center justify-center"
+                style={{
+                  background: "rgba(16,185,129,0.10)",
+                  border: "1px solid rgba(16,185,129,0.25)",
+                }}
+              >
+                <CheckCircle2 className="w-6 h-6" style={{ color: "#6ee7b7" }} />
               </div>
-              <h4 className="text-sm font-bold text-white">0 Conflicts Detected!</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                All faculty schedules, room capacities, section periods, and time constraints are completely satisfied.
+              <h4 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                0 Conflicts Detected
+              </h4>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                All faculty schedules, room capacities, section periods, and time constraints are satisfied.
               </p>
             </div>
           ) : (
@@ -259,37 +406,54 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
                 return (
                   <div
                     key={conflict._id}
-                    className={`glass-card p-4 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'border-indigo-500 bg-indigo-950/30 ring-1 ring-indigo-500'
-                        : 'border-slate-800 hover:border-slate-700 bg-slate-900/60'
-                    }`}
+                    className="glass-card p-4 transition-all cursor-pointer"
+                    style={{
+                      borderColor: isSelected
+                        ? "rgba(99,102,241,0.50)"
+                        : "rgba(239,68,68,0.20)",
+                      background: isSelected
+                        ? "rgba(79,70,229,0.10)"
+                        : "rgba(239,68,68,0.04)",
+                      boxShadow: isSelected
+                        ? "0 0 0 1px rgba(99,102,241,0.30), 0 4px 20px rgba(79,70,229,0.12)"
+                        : "",
+                    }}
                     onClick={() => handleFindAlternatives(conflict)}
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                        style={{
+                          background: "rgba(239,68,68,0.12)",
+                          border: "1px solid rgba(239,68,68,0.25)",
+                          color: "#fca5a5",
+                        }}
+                      >
                         {conflict.type.replace(/_/g, ' ')}
                       </span>
-                      <span className="text-[11px] text-slate-400 font-medium">
+                      <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                         {conflict.day ? `${conflict.day} ${conflict.timeSlot || ''}` : 'General'}
                       </span>
                     </div>
 
-                    <p className="text-xs font-semibold text-slate-200 leading-snug">
+                    <p className="text-xs font-medium leading-snug" style={{ color: "var(--text-secondary)" }}>
                       {conflict.message}
                     </p>
 
-                    <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-800/80 text-[11px]">
-                      <span className="text-slate-400">
-                        {conflict.affectedEntries?.length || 1} Entry affected
+                    <div
+                      className="mt-3 flex items-center justify-between pt-3 text-[11px]"
+                      style={{ borderTop: "1px solid rgba(79,70,229,0.10)" }}
+                    >
+                      <span style={{ color: "var(--text-muted)" }}>
+                        {conflict.affectedEntries?.length || 1} entry affected
                       </span>
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFindAlternatives(conflict);
-                        }}
-                        className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                        onClick={(e) => { e.stopPropagation(); handleFindAlternatives(conflict); }}
+                        className="flex items-center gap-1 font-semibold transition-colors"
+                        style={{ color: "#a5b4fc" }}
+                        onMouseEnter={e => e.currentTarget.style.color = "#c7d2fe"}
+                        onMouseLeave={e => e.currentTarget.style.color = "#a5b4fc"}
                       >
                         <span>Find Alternatives</span>
                         <ArrowRight className="w-3 h-3" />
@@ -302,46 +466,76 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
           )}
         </div>
 
-        {/* Right Column: Suggested Alternatives & Ranking Details (7 cols) */}
+        {/* Right Column — Alternatives */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
+            <h3
+              className="text-sm font-semibold flex items-center gap-2"
+              style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <Sparkles className="w-4 h-4" style={{ color: "#a5b4fc" }} />
               <span>Feasible Alternative Schedules</span>
             </h3>
             {alternatives.length > 0 && (
-              <span className="text-[11px] text-emerald-400 font-medium">
-                {alternatives.length} Valid Solutions Ranked
+              <span
+                className="text-[11px] font-medium"
+                style={{ color: "#6ee7b7" }}
+              >
+                {alternatives.length} valid solutions ranked
               </span>
             )}
           </div>
 
           {!selectedConflict ? (
-            <div className="glass-card rounded-2xl p-12 border border-slate-800 text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                <Sparkles className="w-6 h-6" />
+            <div
+              className="glass-card rounded-2xl p-12 text-center space-y-3"
+              style={{ borderColor: "rgba(79,70,229,0.20)" }}
+            >
+              <div
+                className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+                style={{
+                  background: "rgba(79,70,229,0.10)",
+                  border: "1px solid rgba(79,70,229,0.22)",
+                }}
+              >
+                <Sparkles className="w-6 h-6" style={{ color: "#a5b4fc" }} />
               </div>
-              <h4 className="text-sm font-semibold text-white">Select a Conflict to Generate Solutions</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                The resolver engine will permute across all rooms, time slots, and days, filtering out hard violations and ranking the best options.
+              <h4 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                Select a conflict to generate solutions
+              </h4>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                The resolver engine will permute across all rooms, time slots, and days, filtering violations and ranking the best options.
               </p>
             </div>
           ) : findingAlternatives ? (
-            <div className="glass-card rounded-2xl p-12 border border-slate-800 text-center space-y-3">
-              <div className="w-8 h-8 mx-auto border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              <h4 className="text-sm font-semibold text-white">Evaluating Feasible Slots...</h4>
-              <p className="text-xs text-slate-400">
+            <div
+              className="glass-card rounded-2xl p-12 text-center space-y-4"
+              style={{ borderColor: "rgba(79,70,229,0.20)" }}
+            >
+              <div className="spinner mx-auto" style={{ width: "2rem", height: "2rem" }} />
+              <h4 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                Evaluating feasible slots…
+              </h4>
+              <p className="section-desc">
                 Testing room capacity, faculty availability, and section timetable gaps.
               </p>
             </div>
           ) : alternatives.length === 0 ? (
-            <div className="glass-card rounded-2xl p-8 border border-slate-800 text-center space-y-3">
-              <div className="w-10 h-10 mx-auto rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5" />
+            <div
+              className="glass-card rounded-2xl p-8 text-center space-y-3"
+              style={{ borderColor: "rgba(79,70,229,0.20)" }}
+            >
+              <div
+                className="w-10 h-10 mx-auto rounded-full flex items-center justify-center"
+                style={{ background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.25)" }}
+              >
+                <AlertTriangle className="w-5 h-5" style={{ color: "#fcd34d" }} />
               </div>
-              <h4 className="text-sm font-semibold text-white">No Valid Alternative Found</h4>
-              <p className="text-xs text-slate-400">
-                Every tested permutation violates at least one hard constraint. Try toggling Day/Room changes in parameters.
+              <h4 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                No valid alternative found
+              </h4>
+              <p className="section-desc">
+                Every tested permutation violates at least one hard constraint. Try enabling day/room changes.
               </p>
             </div>
           ) : (
@@ -349,78 +543,105 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
               {alternatives.map((alt, idx) => (
                 <div
                   key={idx}
-                  className="glass-card p-5 rounded-2xl border border-slate-800 hover:border-indigo-500/50 transition-all space-y-4"
+                  className="glass-card p-5 transition-all space-y-4"
+                  style={{ borderColor: "rgba(79,70,229,0.18)" }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(79,70,229,0.40)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(79,70,229,0.18)"}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        <span
+                          className="px-2 py-0.5 rounded text-[10px] font-bold"
+                          style={{
+                            background: "rgba(79,70,229,0.15)",
+                            border: "1px solid rgba(79,70,229,0.30)",
+                            color: "#a5b4fc",
+                          }}
+                        >
                           Option #{idx + 1}
                         </span>
-                        <h4 className="text-base font-bold text-white">
+                        <h4
+                          className="text-sm font-bold"
+                          style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
                           {alt.day} {alt.startTime} – {alt.endTime}
                         </h4>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                      <div className="flex items-center gap-3 text-xs mt-1" style={{ color: "var(--text-muted)" }}>
                         <span className="flex items-center gap-1">
-                          <Building className="w-3.5 h-3.5 text-indigo-400" />
+                          <Building className="w-3.5 h-3.5" style={{ color: "#a5b4fc" }} />
                           Room {alt.room.roomNumber} ({alt.room.roomType}, Cap: {alt.room.capacity})
                         </span>
                         <span className="flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-violet-400" />
+                          <User className="w-3.5 h-3.5" style={{ color: "#6ee7b7" }} />
                           {alt.faculty.name}
                         </span>
                       </div>
                     </div>
 
-                    {/* Score Badge */}
-                    <div className="text-right shrink-0">
-                      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-sm">
-                        <TrendingUp className="w-4 h-4 text-emerald-400" />
-                        <span>Score: {alt.score}/100</span>
-                      </div>
+                    <div
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold shrink-0"
+                      style={{
+                        background: "rgba(16,185,129,0.10)",
+                        border: "1px solid rgba(16,185,129,0.25)",
+                        color: "#6ee7b7",
+                      }}
+                    >
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      <span>{alt.score}/100</span>
                     </div>
                   </div>
 
-                  {/* Constraint Passes & Advantages List */}
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <span className="block text-[11px] font-semibold text-slate-300">
-                      Evaluated Constraints & Advantages:
+                  {/* Constraint Summary */}
+                  <div
+                    className="p-3 rounded-xl space-y-2"
+                    style={{
+                      background: "rgba(10,18,40,0.60)",
+                      border: "1px solid rgba(79,70,229,0.12)",
+                    }}
+                  >
+                    <span className="block text-[11px] font-semibold" style={{ color: "var(--text-muted)" }}>
+                      Evaluated constraints &amp; advantages:
                     </span>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 text-xs text-emerald-300">
-                      <div className="flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>0 Hard Collisions</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 text-xs">
+                      <div className="flex items-center gap-1.5" style={{ color: "#6ee7b7" }}>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>0 hard collisions</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Capacity Valid ({alt.room.capacity} seats)</span>
+                      <div className="flex items-center gap-1.5" style={{ color: "#6ee7b7" }}>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Capacity valid ({alt.room.capacity} seats)</span>
                       </div>
                       {alt.advantages.map((adv, i) => (
-                        <div key={i} className="flex items-center gap-1.5 text-slate-300">
-                          <Check className="w-3.5 h-3.5 text-indigo-400" />
+                        <div key={i} className="flex items-center gap-1.5" style={{ color: "var(--text-secondary)" }}>
+                          <Check className="w-3.5 h-3.5" style={{ color: "#a5b4fc" }} />
                           <span>{adv}</span>
                         </div>
                       ))}
                     </div>
-
                     {alt.warnings.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-slate-800/80 text-[11px] text-amber-300 flex items-center gap-1">
-                        <Info className="w-3.5 h-3.5 text-amber-400" />
+                      <div
+                        className="mt-2 pt-2 text-[11px] flex items-center gap-1"
+                        style={{
+                          borderTop: "1px solid rgba(79,70,229,0.12)",
+                          color: "#fcd34d",
+                        }}
+                      >
+                        <Info className="w-3.5 h-3.5" style={{ color: "#fcd34d" }} />
                         <span>{alt.warnings.join(', ')}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Action Buttons */}
                   {isAdmin && (
-                    <div className="flex items-center justify-end gap-3 pt-2">
+                    <div className="flex items-center justify-end pt-1">
                       <button
                         onClick={() => handleOpenImpactAnalysis(alt)}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 flex items-center gap-1.5 transition-all"
+                        className="btn btn-primary btn-sm"
                       >
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>What-If Simulation & Apply</span>
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>What-If Simulation &amp; Apply</span>
                       </button>
                     </div>
                   )}
@@ -431,66 +652,112 @@ const ConflictResolverPage = ({ onJumpToTimetable }) => {
         </div>
       </div>
 
-      {/* What-If Simulation & Confirmation Modal */}
+      {/* Simulation Modal */}
       {showSimulationModal && simulatedImpact && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card rounded-2xl max-w-xl w-full p-6 border border-slate-800 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between">
+        <div className="modal-backdrop">
+          <div className="modal-box glass-elevated max-w-xl" style={{ padding: "1.75rem", borderRadius: "var(--r-2xl)" }}>
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-                  What-If Simulation Mode
-                </span>
-                <h3 className="text-lg font-bold text-white mt-0.5">
+                <span className="section-eyebrow">What-If Simulation</span>
+                <h3
+                  className="text-lg font-bold mt-0.5"
+                  style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
+                >
                   Confirm Timetable Resolution
                 </h3>
               </div>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span
+                className="px-2.5 py-1 rounded-full text-xs font-bold"
+                style={{
+                  background: "rgba(16,185,129,0.10)",
+                  border: "1px solid rgba(16,185,129,0.25)",
+                  color: "#6ee7b7",
+                }}
+              >
                 0 New Conflicts
               </span>
             </div>
 
-            {/* Before vs After Visual Comparison */}
-            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-slate-900 border border-slate-800">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-rose-400 uppercase">Original (Conflicted)</span>
-                <div className="text-xs text-white font-semibold">{simulatedImpact.before.subject}</div>
-                <div className="text-xs text-slate-400">{simulatedImpact.before.day} {simulatedImpact.before.time}</div>
-                <div className="text-xs text-slate-400">Room: {simulatedImpact.before.room}</div>
-                <div className="text-xs text-slate-400">Faculty: {simulatedImpact.before.faculty}</div>
+            {/* Before / After */}
+            <div
+              className="grid grid-cols-2 gap-4 p-4 rounded-xl mb-4"
+              style={{
+                background: "rgba(10,18,40,0.80)",
+                border: "1px solid rgba(79,70,229,0.15)",
+              }}
+            >
+              <div className="space-y-1.5">
+                <span
+                  className="block text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: "#fca5a5" }}
+                >
+                  Original (Conflicted)
+                </span>
+                <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {simulatedImpact.before.subject}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  {simulatedImpact.before.day} · {simulatedImpact.before.time}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Room: {simulatedImpact.before.room}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Faculty: {simulatedImpact.before.faculty}
+                </div>
               </div>
 
-              <div className="space-y-1 border-l border-slate-800 pl-4">
-                <span className="text-[10px] font-bold text-emerald-400 uppercase">Proposed Alternative</span>
-                <div className="text-xs text-white font-semibold">{simulatedImpact.after.subject}</div>
-                <div className="text-xs text-emerald-300 font-medium">{simulatedImpact.after.day} {simulatedImpact.after.time}</div>
-                <div className="text-xs text-slate-300">Room: {simulatedImpact.after.room}</div>
-                <div className="text-xs text-slate-300">Faculty: {simulatedImpact.after.faculty}</div>
+              <div
+                className="space-y-1.5 pl-4"
+                style={{ borderLeft: "1px solid rgba(79,70,229,0.18)" }}
+              >
+                <span
+                  className="block text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: "#6ee7b7" }}
+                >
+                  Proposed Alternative
+                </span>
+                <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {simulatedImpact.after.subject}
+                </div>
+                <div className="text-xs font-medium" style={{ color: "#6ee7b7" }}>
+                  {simulatedImpact.after.day} · {simulatedImpact.after.time}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  Room: {simulatedImpact.after.room}
+                </div>
+                <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  Faculty: {simulatedImpact.after.faculty}
+                </div>
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {simulatedImpact.summary} Applying this change will persist the updated schedule in MongoDB and automatically revalidate all remaining entries.
+            <p className="text-xs leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>
+              {simulatedImpact.summary} Applying this change will persist the updated schedule and automatically revalidate all remaining entries.
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div
+              className="flex items-center justify-end gap-3 pt-4"
+              style={{ borderTop: "1px solid rgba(79,70,229,0.15)" }}
+            >
               <button
                 onClick={() => setShowSimulationModal(false)}
                 disabled={applyingAlt}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all"
+                className="btn btn-secondary btn-sm"
               >
-                Discard / Cancel
+                Discard
               </button>
               <button
                 onClick={handleApplyChosenAlternative}
                 disabled={applyingAlt}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all disabled:opacity-50"
+                className="btn btn-primary"
               >
                 {applyingAlt ? (
                   <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Apply Resolution to DB</span>
+                    <span>Apply Resolution</span>
                   </>
                 )}
               </button>

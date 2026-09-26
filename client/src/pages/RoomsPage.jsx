@@ -129,131 +129,121 @@ const RoomsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            Campus Facilities
-          </span>
-          <h2 className="text-2xl font-bold text-white mt-0.5">Room & Lab Management</h2>
-          <p className="text-xs text-slate-400">
-            Monitor real-time capacity, equipment availability, and weekly utilization rates.
-          </p>
+    <div className="space-y-5 panel-enter-3d">
+      <div
+        className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, rgba(22,34,64,0.80) 0%, rgba(10,18,40,0.90) 100%)" }}
+      >
+        <div
+          style={{ position: "absolute", right: 0, top: 0, width: "30%", height: "200%",
+            background: "radial-gradient(ellipse at 80% 50%, rgba(79,70,229,0.06) 0%, transparent 70%)", pointerEvents: "none" }}
+        />
+        <div className="relative">
+          <span className="section-eyebrow">Campus Facilities</span>
+          <h2 className="section-title mt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Room &amp; Lab <span className="text-gradient-indigo">Management</span>
+          </h2>
+          <p className="section-desc mt-1">Monitor real-time capacity, equipment availability, and weekly utilization rates.</p>
         </div>
-
         {isAdmin && (
-          <button
-            onClick={handleOpenAdd}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all"
-          >
+          <button onClick={handleOpenAdd} className="btn btn-primary shrink-0 relative">
             <Plus className="w-4 h-4" />
             <span>Add Facility</span>
           </button>
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search room number or building..."
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-          />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="input-with-icon w-full sm:w-80">
+          <Search className="input-icon" />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search room number or building…" className="input-field" />
         </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-400">Facility Type:</span>
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
-          >
-            <option value="ALL">All Facilities</option>
+        <div className="flex items-center gap-2">
+          <label className="input-label" style={{ whiteSpace: "nowrap" }}>Facility type:</label>
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="input-field" style={{ width: "auto" }}>
+            <option value="ALL">All facilities</option>
             <option value="CLASSROOM">Classrooms</option>
             <option value="LAB">Laboratories</option>
-            <option value="SEMINAR_HALL">Seminar Halls</option>
+            <option value="SEMINAR_HALL">Seminar halls</option>
           </select>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-xs text-slate-400">Loading rooms...</div>
+        <div className="flex justify-center py-16"><div className="spinner" /></div>
       ) : rooms.length === 0 ? (
-        <div className="glass-card rounded-2xl p-12 text-center border border-slate-800 space-y-3">
-          <DoorClosed className="w-10 h-10 mx-auto text-slate-600" />
-          <h4 className="text-sm font-semibold text-white">No Facilities Found</h4>
-          <p className="text-xs text-slate-400">Add a new room or laboratory.</p>
+        <div className="glass-card p-12 text-center space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+            style={{ background: "rgba(79,70,229,0.10)", border: "1px solid rgba(79,70,229,0.22)" }}>
+            <DoorClosed className="w-6 h-6" style={{ color: "#a5b4fc" }} />
+          </div>
+          <h4 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>No Facilities Found</h4>
+          <p className="section-desc">Add a new room or laboratory.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {rooms.map((room) => (
-            <div
-              key={room._id}
-              className="glass-card p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between"
-            >
+            <div key={room._id} className="card-3d p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-indigo-400">
-                      <DoorClosed className="w-5 h-5" />
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: "rgba(79,70,229,0.12)", border: "1px solid rgba(79,70,229,0.22)" }}>
+                      <DoorClosed className="w-5 h-5" style={{ color: "#a5b4fc" }} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-white leading-tight">{room.roomNumber}</h3>
-                      <span className="text-[11px] text-slate-400">{room.building}</span>
+                      <h3 className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {room.roomNumber}
+                      </h3>
+                      <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>{room.building}</span>
                     </div>
                   </div>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      room.roomType === 'LAB'
-                        ? 'bg-purple-950 text-purple-300 border border-purple-500/30'
-                        : 'bg-indigo-950 text-indigo-300 border border-indigo-500/30'
-                    }`}
-                  >
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                    style={room.roomType === 'LAB' ? {
+                      background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#c4b5fd"
+                    } : {
+                      background: "rgba(79,70,229,0.12)", border: "1px solid rgba(79,70,229,0.25)", color: "#a5b4fc"
+                    }}>
                     {room.roomType}
                   </span>
                 </div>
 
-                <div className="mt-3 space-y-2 text-xs text-slate-300">
+                <div className="mt-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Capacity:</span>
-                    <span className="font-bold text-white">{room.capacity} Seats</span>
+                    <span style={{ color: "var(--text-muted)" }}>Capacity:</span>
+                    <span className="font-bold" style={{ color: "var(--text-primary)" }}>{room.capacity} seats</span>
                   </div>
 
-                  {/* Utilization Progress Bar */}
                   <div>
-                    <div className="flex items-center justify-between text-[11px] mb-1">
-                      <span className="text-slate-400">Utilization Rate:</span>
-                      <span className="font-semibold text-indigo-300">
+                    <div className="flex items-center justify-between text-[11px] mb-1.5">
+                      <span style={{ color: "var(--text-muted)" }}>Utilization:</span>
+                      <span className="font-semibold" style={{ color: "#a5b4fc" }}>
                         {room.currentUsagePercent || 0}% ({room.activeBookingsCount || 0} periods/wk)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="progress-bar">
                       <div
-                        className={`h-full rounded-full ${
-                          (room.currentUsagePercent || 0) > 80
-                            ? 'bg-rose-500'
+                        className="progress-bar-fill"
+                        style={{
+                          width: `${room.currentUsagePercent || 0}%`,
+                          background: (room.currentUsagePercent || 0) > 80
+                            ? "linear-gradient(90deg, #ef4444 0%, #fca5a5 100%)"
                             : (room.currentUsagePercent || 0) > 50
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-500'
-                        }`}
-                        style={{ width: `${room.currentUsagePercent || 0}%` }}
+                            ? "linear-gradient(90deg, #f59e0b 0%, #fcd34d 100%)"
+                            : "linear-gradient(90deg, #4f46e5 0%, #818cf8 100%)",
+                        }}
                       />
                     </div>
                   </div>
 
-                  {/* Equipment List */}
                   {room.equipment && room.equipment.length > 0 && (
                     <div className="pt-2">
-                      <span className="text-[10px] font-semibold text-slate-500 block uppercase">Equipment:</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider block" style={{ color: "var(--text-faint)" }}>Equipment:</span>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
                         {room.equipment.map((eq, i) => (
-                          <span
-                            key={i}
-                            className="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-300 text-[10px]"
-                          >
+                          <span key={i} className="px-1.5 py-0.5 rounded text-[10px]"
+                            style={{ background: "rgba(79,70,229,0.10)", color: "var(--text-secondary)", border: "1px solid rgba(79,70,229,0.18)" }}>
                             {eq}
                           </span>
                         ))}
@@ -264,17 +254,13 @@ const RoomsPage = () => {
               </div>
 
               {isAdmin && (
-                <div className="flex items-center justify-end gap-1 pt-3 mt-3 border-t border-slate-800/80">
-                  <button
-                    onClick={() => handleOpenEdit(room)}
-                    className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
-                  >
+                <div className="flex items-center justify-end gap-1 pt-3 mt-3" style={{ borderTop: "1px solid rgba(79,70,229,0.12)" }}>
+                  <button onClick={() => handleOpenEdit(room)} className="btn btn-ghost btn-sm" style={{ padding: "0.375rem 0.5rem" }} title="Edit">
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
-                  <button
-                    onClick={() => handleDelete(room._id)}
-                    className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-400"
-                  >
+                  <button onClick={() => handleDelete(room._id)} className="btn btn-ghost btn-sm" style={{ padding: "0.375rem 0.5rem", color: "#fca5a5" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.10)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"} title="Delete">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -285,8 +271,8 @@ const RoomsPage = () => {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card rounded-2xl max-w-md w-full p-6 border border-slate-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+        <div className="modal-backdrop">
+          <div className="modal-box glass-elevated max-w-md" style={{ padding: "1.5rem", borderRadius: "var(--r-2xl)" }}>
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white">
                 {editingRoom ? 'Edit Room' : 'Add New Room / Lab'}
@@ -299,7 +285,7 @@ const RoomsPage = () => {
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Room Number</label>
+                  <label className="input-label">Room Number</label>
                   <input
                     type="text"
                     value={formData.roomNumber}
@@ -311,37 +297,37 @@ const RoomsPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Building</label>
+                  <label className="input-label">Building</label>
                   <input
                     type="text"
                     value={formData.building}
                     onChange={(e) => setFormData({ ...formData, building: e.target.value })}
                     required
                     placeholder="Academic Block A"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="input-field"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Seating Capacity</label>
+                  <label className="input-label">Seating Capacity</label>
                   <input
                     type="number"
                     value={formData.capacity}
                     onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
                     min={1}
                     max={500}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="input-field"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Room Type</label>
+                  <label className="input-label">Room Type</label>
                   <select
                     value={formData.roomType}
                     onChange={(e) => setFormData({ ...formData, roomType: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="input-field"
                   >
                     <option value="CLASSROOM">Classroom</option>
                     <option value="LAB">Laboratory</option>
@@ -351,7 +337,7 @@ const RoomsPage = () => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label className="input-label">
                   Equipment (comma separated)
                 </label>
                 <input
@@ -359,7 +345,7 @@ const RoomsPage = () => {
                   value={formData.equipment}
                   onChange={(e) => setFormData({ ...formData, equipment: e.target.value })}
                   placeholder="Projector, Smartboard, 60 Workstations"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="input-field"
                 />
               </div>
 
@@ -369,7 +355,7 @@ const RoomsPage = () => {
                   id="availCheck"
                   checked={formData.available}
                   onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                  className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0"
+                  className="rounded bg-slate-900 border-slate-700 text-fuchsia-600 focus:ring-0"
                 />
                 <label htmlFor="availCheck" className="text-slate-300 cursor-pointer">
                   Room is currently active and available for scheduling
@@ -387,7 +373,7 @@ const RoomsPage = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold shadow-lg shadow-indigo-600/30"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-fuchsia-600 to-orange-600 hover:from-fuchsia-500 hover:to-orange-500 text-white font-semibold shadow-lg shadow-fuchsia-600/30"
                 >
                   {saving ? 'Saving...' : 'Save Facility'}
                 </button>
@@ -401,3 +387,4 @@ const RoomsPage = () => {
 };
 
 export default RoomsPage;
+

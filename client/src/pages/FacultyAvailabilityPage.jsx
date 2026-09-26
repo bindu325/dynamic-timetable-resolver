@@ -130,126 +130,147 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 panel-enter-3d">
       {/* Header */}
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            Faculty Workload & Preferences
-          </span>
-          <h2 className="text-2xl font-bold text-white mt-0.5">
-            Weekly Availability Matrix
+      <div
+        className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, rgba(22,34,64,0.80) 0%, rgba(10,18,40,0.90) 100%)" }}
+      >
+        <div
+          style={{ position: "absolute", right: 0, top: 0, width: "30%", height: "200%",
+            background: "radial-gradient(ellipse at 80% 50%, rgba(79,70,229,0.06) 0%, transparent 70%)", pointerEvents: "none" }}
+        />
+        <div className="relative">
+          <span className="section-eyebrow">Faculty Workload & Preferences</span>
+          <h2 className="section-title mt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Weekly <span className="text-gradient-indigo">Availability Matrix</span>
           </h2>
-          <p className="text-xs text-slate-400">
-            Configure preferred working hours and mark unavailable slots to prevent collision.
-          </p>
+          <p className="section-desc mt-1">Configure preferred working hours and mark unavailable slots to prevent collision.</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Faculty Selector (Admin only or switcher) */}
+        <div className="flex items-center gap-3 relative">
           {isAdmin && (
             <select
               value={selectedFacultyId}
               onChange={(e) => setSelectedFacultyId(e.target.value)}
-              className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+              className="input-field"
+              style={{ width: "auto", minWidth: "200px" }}
             >
               {faculties.map((f) => (
-                <option key={f._id} value={f._id}>
-                  {f.name} ({f.department})
-                </option>
+                <option key={f._id} value={f._id}>{f.name} ({f.department})</option>
               ))}
             </select>
           )}
-
           <button
             onClick={handleSaveAvailability}
             disabled={saving}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all disabled:opacity-50"
+            className="btn btn-primary"
           >
             <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving...' : 'Save Availability'}</span>
+            <span>{saving ? 'Saving…' : 'Save Availability'}</span>
           </button>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="glass-card px-5 py-3 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
-        <span className="text-slate-400 font-medium">Click any time cell to toggle state:</span>
+      <div
+        className="glass-card px-5 py-3 rounded-xl flex flex-wrap items-center justify-between gap-4 text-xs"
+        style={{ borderColor: "rgba(79,70,229,0.18)" }}
+      >
+        <span style={{ color: "var(--text-secondary)" }} className="font-medium">Click any time cell to toggle state:</span>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-              <Check className="w-2.5 h-2.5" />
+            <div className="w-3.5 h-3.5 rounded flex items-center justify-center"
+              style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)" }}>
+              <Check className="w-2.5 h-2.5" style={{ color: "#6ee7b7" }} />
             </div>
-            <span className="text-slate-300">Available</span>
+            <span style={{ color: "var(--text-secondary)" }}>Available</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
-              <X className="w-2.5 h-2.5" />
+            <div className="w-3.5 h-3.5 rounded flex items-center justify-center"
+              style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)" }}>
+              <X className="w-2.5 h-2.5" style={{ color: "#fca5a5" }} />
             </div>
-            <span className="text-slate-300">Unavailable (Hard Constraint)</span>
+            <span style={{ color: "var(--text-secondary)" }}>Unavailable (Hard constraint)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              <Star className="w-2.5 h-2.5" />
+            <div className="w-3.5 h-3.5 rounded flex items-center justify-center"
+              style={{ background: "rgba(79,70,229,0.15)", border: "1px solid rgba(79,70,229,0.35)" }}>
+              <Star className="w-2.5 h-2.5" style={{ color: "#a5b4fc" }} />
             </div>
-            <span className="text-slate-300">Preferred (Optimizer Boost)</span>
+            <span style={{ color: "var(--text-secondary)" }}>Preferred (Optimizer boost)</span>
           </div>
         </div>
       </div>
 
       {/* Visual Availability Matrix Grid */}
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+      <div
+        className="glass-card overflow-hidden"
+        style={{ borderRadius: "var(--r-xl)" }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-center border-collapse min-w-[700px]">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/90 text-slate-400 text-xs font-semibold">
-                <th className="p-4 text-left">Day / Time Slot</th>
+              <tr
+                style={{
+                  background: "rgba(10,18,40,0.90)",
+                  borderBottom: "1px solid rgba(79,70,229,0.18)",
+                }}
+              >
+                <th
+                  className="p-4 text-left text-xs font-bold"
+                  style={{ color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}
+                >
+                  Day / Time Slot
+                </th>
                 {SLOTS.map((slot) => (
-                  <th key={slot.startTime} className="p-4 border-l border-slate-800">
+                  <th key={slot.startTime} className="p-4 text-xs font-semibold"
+                    style={{ borderLeft: "1px solid rgba(79,70,229,0.10)", color: "var(--text-secondary)" }}>
                     {slot.startTime} - {slot.endTime}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-xs">
-              {DAYS.map((day) => (
-                <tr key={day} className="hover:bg-slate-900/40 transition-colors">
-                  <td className="p-4 text-left font-bold text-indigo-300 bg-slate-900/50">
+            <tbody className="text-xs">
+              {DAYS.map((day, rowIdx) => (
+                <tr key={day}
+                  style={{ borderBottom: "1px solid rgba(79,70,229,0.08)",
+                    background: rowIdx % 2 === 0 ? "rgba(22,34,64,0.30)" : "rgba(10,18,40,0.30)" }}>
+                  <td
+                    className="p-4 text-left font-bold"
+                    style={{ color: "#a5b4fc", background: rowIdx % 2 === 0 ? "rgba(10,18,40,0.90)" : "rgba(7,13,30,0.92)",
+                      borderRight: "1px solid rgba(79,70,229,0.12)", fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
                     {day}
                   </td>
                   {SLOTS.map((slot) => {
                     const key = `${slot.startTime}-${slot.endTime}`;
                     const status = availabilityMatrix[day]?.[key] || 'AVAILABLE';
                     return (
-                      <td key={key} className="p-2.5 border-l border-slate-800/60">
+                      <td key={key} className="p-2" style={{ borderLeft: "1px solid rgba(79,70,229,0.08)" }}>
                         <button
                           type="button"
                           onClick={() => toggleSlotStatus(day, key)}
-                          className={`w-full py-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
-                            status === 'UNAVAILABLE'
-                              ? 'bg-rose-950/40 border-rose-500/40 text-rose-300 shadow-md shadow-rose-950/30'
-                              : status === 'PREFERRED'
-                              ? 'bg-amber-950/40 border-amber-500/40 text-amber-300 shadow-md shadow-amber-950/30'
-                              : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
-                          }`}
+                          className="w-full py-3 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all"
+                          style={status === 'UNAVAILABLE' ? {
+                            background: "rgba(239,68,68,0.12)", borderColor: "rgba(239,68,68,0.40)", color: "#fca5a5"
+                          } : status === 'PREFERRED' ? {
+                            background: "rgba(79,70,229,0.15)", borderColor: "rgba(79,70,229,0.45)", color: "#a5b4fc"
+                          } : {
+                            background: "rgba(10,18,40,0.50)", borderColor: "rgba(79,70,229,0.12)", color: "var(--text-faint)"
+                          }}
                         >
                           {status === 'UNAVAILABLE' && (
-                            <>
-                              <X className="w-4 h-4 text-rose-400" />
-                              <span className="text-[10px] font-bold">UNAVAILABLE</span>
-                            </>
+                            <><X className="w-4 h-4" style={{ color: "#fca5a5" }} />
+                              <span className="text-[10px] font-bold">UNAVAILABLE</span></>
                           )}
                           {status === 'PREFERRED' && (
-                            <>
-                              <Star className="w-4 h-4 text-amber-400" />
-                              <span className="text-[10px] font-bold">PREFERRED</span>
-                            </>
+                            <><Star className="w-4 h-4" style={{ color: "#a5b4fc" }} />
+                              <span className="text-[10px] font-bold">PREFERRED</span></>
                           )}
                           {status === 'AVAILABLE' && (
-                            <>
-                              <Check className="w-4 h-4 text-emerald-400 opacity-60" />
-                              <span className="text-[10px] opacity-70">AVAILABLE</span>
-                            </>
+                            <><Check className="w-4 h-4 opacity-50" style={{ color: "#6ee7b7" }} />
+                              <span className="text-[10px] opacity-60">AVAILABLE</span></>
                           )}
                         </button>
                       </td>
@@ -266,3 +287,4 @@ const FacultyAvailabilityPage = ({ targetFacultyId }) => {
 };
 
 export default FacultyAvailabilityPage;
+

@@ -77,23 +77,24 @@ const TimeSlotsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            Schedule Boundaries
-          </span>
-          <h2 className="text-2xl font-bold text-white mt-0.5">Time Slot Management</h2>
-          <p className="text-xs text-slate-400">
-            Define daily periods, lecture durations, and bell schedules across days.
-          </p>
+    <div className="space-y-5 panel-enter-3d">
+      <div
+        className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, rgba(22,34,64,0.80) 0%, rgba(10,18,40,0.90) 100%)" }}
+      >
+        <div
+          style={{ position: "absolute", right: 0, top: 0, width: "30%", height: "200%",
+            background: "radial-gradient(ellipse at 80% 50%, rgba(79,70,229,0.06) 0%, transparent 70%)", pointerEvents: "none" }}
+        />
+        <div className="relative">
+          <span className="section-eyebrow">Schedule Boundaries</span>
+          <h2 className="section-title mt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Time Slot <span className="text-gradient-indigo">Management</span>
+          </h2>
+          <p className="section-desc mt-1">Define daily periods, lecture durations, and bell schedules across days.</p>
         </div>
-
         {isAdmin && (
-          <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2"
-          >
+          <button onClick={() => setShowModal(true)} className="btn btn-primary shrink-0 relative">
             <Plus className="w-4 h-4" />
             <span>Create Time Slot</span>
           </button>
@@ -101,53 +102,45 @@ const TimeSlotsPage = () => {
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-xs text-slate-400">Filter Day:</span>
-        <select
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-          className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
-        >
-          <option value="ALL">All Days (Monday - Saturday)</option>
-          {DAYS.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
+        <label className="input-label" style={{ whiteSpace: "nowrap" }}>Filter day:</label>
+        <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className="input-field" style={{ width: "auto" }}>
+          <option value="ALL">All days (Mon–Sat)</option>
+          {DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
         </select>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-xs text-slate-400">Loading time slots...</div>
+        <div className="flex justify-center py-16"><div className="spinner" /></div>
       ) : timeSlots.length === 0 ? (
-        <div className="glass-card rounded-2xl p-12 text-center border border-slate-800 space-y-3">
-          <Clock className="w-10 h-10 mx-auto text-slate-600" />
-          <h4 className="text-sm font-semibold text-white">No Slots Configured</h4>
-          <p className="text-xs text-slate-400">Add period intervals to construct your schedule.</p>
+        <div className="glass-card p-12 text-center space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+            style={{ background: "rgba(79,70,229,0.10)", border: "1px solid rgba(79,70,229,0.22)" }}>
+            <Clock className="w-6 h-6" style={{ color: "#a5b4fc" }} />
+          </div>
+          <h4 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>No Slots Configured</h4>
+          <p className="section-desc">Add period intervals to construct your schedule.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {timeSlots.map((slot) => (
-            <div
-              key={slot._id}
-              className="glass-card p-4 rounded-xl border border-slate-800 flex items-center justify-between"
-            >
+            <div key={slot._id} className="card-depth p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xs">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs"
+                  style={{ background: "rgba(79,70,229,0.15)", border: "1px solid rgba(79,70,229,0.25)", color: "#a5b4fc",
+                    fontFamily: "'JetBrains Mono', monospace" }}>
                   P{slot.periodNumber}
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">
+                  <h4 className="text-sm font-bold" style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}>
                     {slot.startTime} – {slot.endTime}
                   </h4>
-                  <span className="text-[11px] text-slate-400">{slot.day}</span>
+                  <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>{slot.day}</span>
                 </div>
               </div>
-
               {isAdmin && (
-                <button
-                  onClick={() => handleDelete(slot._id)}
-                  className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-400"
-                >
+                <button onClick={() => handleDelete(slot._id)} className="btn btn-ghost btn-sm" style={{ padding: "0.375rem" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#fca5a5"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
@@ -157,7 +150,7 @@ const TimeSlotsPage = () => {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="modal-backdrop">
           <div className="glass-card rounded-2xl max-w-md w-full p-6 border border-slate-800 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white">New Period Slot</h3>
@@ -168,11 +161,11 @@ const TimeSlotsPage = () => {
 
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Day</label>
+                <label className="input-label">Day</label>
                 <select
                   value={formData.day}
                   onChange={(e) => setFormData({ ...formData, day: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="input-field"
                 >
                   {DAYS.map((d) => (
                     <option key={d} value={d}>
@@ -184,37 +177,37 @@ const TimeSlotsPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Start Time (24-hr)</label>
+                  <label className="input-label">Start Time (24-hr)</label>
                   <input
                     type="time"
                     value={formData.startTime}
                     onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="input-field"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">End Time (24-hr)</label>
+                  <label className="input-label">End Time (24-hr)</label>
                   <input
                     type="time"
                     value={formData.endTime}
                     onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="input-field"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Period Number</label>
+                <label className="input-label">Period Number</label>
                 <input
                   type="number"
                   value={formData.periodNumber}
                   onChange={(e) => setFormData({ ...formData, periodNumber: Number(e.target.value) })}
                   min={1}
                   max={12}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  className="input-field"
                 />
               </div>
 
@@ -229,7 +222,7 @@ const TimeSlotsPage = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold shadow-lg shadow-indigo-600/30"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-fuchsia-600 to-orange-600 hover:from-fuchsia-500 hover:to-orange-500 text-white font-semibold shadow-lg shadow-fuchsia-600/30"
                 >
                   {saving ? 'Saving...' : 'Save Time Slot'}
                 </button>
@@ -243,3 +236,4 @@ const TimeSlotsPage = () => {
 };
 
 export default TimeSlotsPage;
+
