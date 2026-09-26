@@ -34,19 +34,19 @@ const HistoryPage = () => {
 
   useEffect(() => { fetchHistory(); }, [filterType]);
 
-  const getChangeStyle = (type) => {
+  const getBadgeStyle = (type) => {
     switch (type) {
       case 'RESOLVE_CONFLICT':
       case 'AUTO_RESOLVE':
-        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        return 'bg-[#edf5ee] text-[#4d7358] border-[#c7decb]';
       case 'CREATE':
-        return 'bg-teal-50 text-teal-800 border-teal-200/60';
+        return 'bg-[#faf4ea] text-[#8c5e47] border-[#ebd6b3]';
       case 'UPDATE':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
+        return 'bg-[#faf4ea] text-[#a87432] border-[#ebd6b3]';
       case 'DELETE':
-        return 'bg-rose-50 text-rose-800 border-rose-200';
+        return 'bg-[#faeceb] text-[#a8483f] border-[#f0c7c3]';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-[#faf9f5] text-[#57524a] border-[#e5ded2]';
     }
   };
 
@@ -54,27 +54,27 @@ const HistoryPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="app-card p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#ede8df]">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#faf4ea] text-[#8c5e47] border border-[#ebd6b3]">
                 <History className="w-3.5 h-3.5" />
                 Audit Trail
               </span>
-              <span className="text-xs text-slate-500 font-medium">Activity Log</span>
+              <span className="text-xs text-[#8a8275] font-medium">Activity Log</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Schedule Activity Timeline</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-xl font-bold text-[#2d2a26] tracking-tight">Schedule Activity Timeline</h2>
+            <p className="text-xs text-[#8a8275] mt-0.5">
               Chronological audit ledger of automated conflict resolutions, manual edits, and period allocations.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-600">Filter Action:</span>
+            <span className="text-xs font-semibold text-[#57524a]">Filter Action:</span>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
+              className="bg-[#faf9f5] border border-[#e5ded2] rounded-lg px-3 py-1.5 text-xs font-semibold text-[#2d2a26] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47]"
             >
               <option value="ALL">All Actions</option>
               <option value="RESOLVE_CONFLICT">Conflict Resolutions</option>
@@ -88,14 +88,14 @@ const HistoryPage = () => {
 
       {/* Content */}
       {loading ? (
-        <div className="app-card p-12 text-center text-xs text-slate-400">Loading audit history...</div>
+        <div className="app-card p-12 text-center text-xs text-[#8a8275]">Loading audit history...</div>
       ) : history.length === 0 ? (
         <div className="app-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#faf9f5] border border-[#e5ded2] flex items-center justify-center text-[#8a8275]">
             <History className="w-6 h-6" />
           </div>
-          <h4 className="text-sm font-bold text-slate-900">No Change History Recorded</h4>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <h4 className="text-sm font-bold text-[#2d2a26]">No Change History Recorded</h4>
+          <p className="text-xs text-[#8a8275] max-w-sm mx-auto">
             Modifications to schedules and automated resolution actions will appear here in chronological order.
           </p>
         </div>
@@ -104,30 +104,30 @@ const HistoryPage = () => {
           {history.map((record) => (
             <div
               key={record._id}
-              className="app-card p-4.5 hover:border-teal-400 hover:shadow-xs transition-all space-y-2.5"
+              className="app-card p-4.5 hover:border-[#d8cebf] hover:shadow-sm transition-all space-y-2.5"
             >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2.5">
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getBadgeStyle(record.changeType)}`}>
                     {record.changeType.replace(/_/g, ' ')}
                   </span>
-                  <span className="text-xs font-bold text-slate-900">
+                  <span className="text-xs font-bold text-[#2d2a26]">
                     {record.reason}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <div className="flex items-center gap-1.5 text-[11px] text-[#8a8275] font-medium">
+                  <Clock className="w-3.5 h-3.5 text-[#8a8275]" />
                   <span>{new Date(record.timestamp || record.createdAt).toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Before vs After Context snippet */}
               {(record.before || record.after) && (
-                <div className="text-xs text-slate-600 p-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center gap-4 flex-wrap">
+                <div className="text-xs text-[#57524a] p-3 rounded-lg bg-[#faf9f5] border border-[#ede8df] flex items-center gap-4 flex-wrap">
                   {record.before && (
-                    <div className="flex items-center gap-1.5 text-slate-600">
-                      <span className="text-rose-600 font-bold text-[11px]">Before:</span>
+                    <div className="flex items-center gap-1.5 text-[#57524a]">
+                      <span className="text-[#a8483f] font-bold text-[11px]">Before:</span>
                       <span>
                         {record.before.day || 'N/A'} {record.before.startTime ? `${record.before.startTime}-${record.before.endTime}` : ''}
                       </span>
@@ -135,12 +135,12 @@ const HistoryPage = () => {
                   )}
 
                   {record.before && record.after && (
-                    <ArrowRight className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                    <ArrowRight className="w-3.5 h-3.5 text-[#8c5e47] shrink-0" />
                   )}
 
                   {record.after && (
-                    <div className="flex items-center gap-1.5 text-slate-800">
-                      <span className="text-emerald-600 font-bold text-[11px]">After:</span>
+                    <div className="flex items-center gap-1.5 text-[#2d2a26]">
+                      <span className="text-[#4d7358] font-bold text-[11px]">After:</span>
                       <span className="font-semibold">
                         {record.after.day || 'N/A'} {record.after.startTime ? `${record.after.startTime}-${record.after.endTime}` : ''}
                       </span>
@@ -149,13 +149,13 @@ const HistoryPage = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+              <div className="flex items-center justify-between text-[11px] text-[#8a8275] pt-1">
                 <span className="flex items-center gap-1">
-                  <User className="w-3 h-3 text-slate-400" />
-                  <span>Changed by: <strong className="text-slate-700 font-medium">{record.changedByName || record.changedBy?.name || 'Administrator'}</strong></span>
+                  <User className="w-3 h-3 text-[#8a8275]" />
+                  <span>Changed by: <strong className="text-[#57524a] font-medium">{record.changedByName || record.changedBy?.name || 'Administrator'}</strong></span>
                 </span>
                 {record.impactSummary && (
-                  <span className="text-teal-700 font-medium">({record.impactSummary})</span>
+                  <span className="text-[#8c5e47] font-medium">({record.impactSummary})</span>
                 )}
               </div>
             </div>

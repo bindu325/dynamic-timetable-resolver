@@ -62,57 +62,65 @@ const CreateTimetablePage = ({ setActiveTab }) => {
     {
       title: "Population Data",
       icon: Users,
-      iconColor: "#a5b4fc",
+      iconColor: "#8c5e47",
+      bgColor: "#faf4ea",
+      borderColor: "#ebd6b3",
       fields: [
         {
           type: "grid",
           cols: 2,
           items: [
-            { label: "Total students", name: "studentCount", inputType: "number", icon: Users },
-            { label: "Total faculty", name: "facultyCount", inputType: "number", icon: UserCheck },
+            { label: "Total Students", name: "studentCount", inputType: "number", icon: Users },
+            { label: "Total Faculty", name: "facultyCount", inputType: "number", icon: UserCheck },
           ],
         },
-        { label: "Faculty identifiers (CSV)", name: "facultyNames", inputType: "textarea" },
+        { label: "Faculty Identifiers (CSV)", name: "facultyNames", inputType: "textarea" },
         { label: "Departments (CSV)", name: "departmentList", inputType: "textarea" },
       ],
     },
     {
       title: "Academic Curriculum",
       icon: BookOpen,
-      iconColor: "#6ee7b7",
+      iconColor: "#526b58",
+      bgColor: "#edf5ee",
+      borderColor: "#c7decb",
       fields: [
-        { label: "Number of subjects", name: "subjectCount", inputType: "number", icon: BookOpen },
-        { label: "Subject names (CSV)", name: "subjectNames", inputType: "textarea" },
+        { label: "Number of Subjects", name: "subjectCount", inputType: "number", icon: BookOpen },
+        { label: "Subject Names (CSV)", name: "subjectNames", inputType: "textarea" },
       ],
     },
     {
       title: "Infrastructure Data",
       icon: DoorClosed,
-      iconColor: "#fcd34d",
+      iconColor: "#a87432",
+      bgColor: "#faf4ea",
+      borderColor: "#ebd6b3",
       fields: [
         {
           type: "grid",
           cols: 2,
           items: [
             { label: "Classrooms", name: "classroomCount", inputType: "number" },
-            { label: "Campus blocks", name: "blockCount", inputType: "number", icon: Building },
+            { label: "Campus Blocks", name: "blockCount", inputType: "number", icon: Building },
           ],
         },
-        { label: "Classroom identifiers (CSV)", name: "classroomNumbers", inputType: "textarea" },
+        { label: "Classroom Identifiers (CSV)", name: "classroomNumbers", inputType: "textarea" },
       ],
     },
     {
       title: "Operational Constraints",
       icon: CalendarDays,
-      iconColor: "#c4b5fd",
+      iconColor: "#49657b",
+      bgColor: "#eef4f8",
+      borderColor: "#c5dae8",
       fields: [
-        { label: "Working days (CSV)", name: "workingDays", inputType: "textarea" },
+        { label: "Working Days (CSV)", name: "workingDays", inputType: "textarea" },
         {
           type: "grid",
           cols: 2,
           items: [
-            { label: "Periods per day", name: "periodsPerDay", inputType: "number", icon: Clock },
-            { label: "Max faculty hrs/week", name: "maxFacultyWorkload", inputType: "number", icon: Settings2 },
+            { label: "Periods per Day", name: "periodsPerDay", inputType: "number", icon: Clock },
+            { label: "Max Faculty Hrs/Week", name: "maxFacultyWorkload", inputType: "number", icon: Settings2 },
           ],
         },
       ],
@@ -122,19 +130,20 @@ const CreateTimetablePage = ({ setActiveTab }) => {
   const renderField = (field, sectionIdx, fieldIdx) => {
     if (field.type === "grid") {
       return (
-        <div key={`${sectionIdx}-${fieldIdx}-grid`} className={`grid grid-cols-${field.cols} gap-4`}>
+        <div key={`${sectionIdx}-${fieldIdx}-grid`} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {field.items.map((item, itemIdx) => (
             <div key={itemIdx}>
-              <label className="input-label">{item.label}</label>
-              <div className={item.icon ? "input-with-icon" : ""}>
-                {item.icon && <item.icon className="input-icon" />}
+              <label className="block text-xs font-semibold text-[#57524a] mb-1.5">{item.label}</label>
+              <div className="relative">
+                {item.icon && <item.icon className="w-4 h-4 text-[#8a8275] absolute left-3 top-1/2 -translate-y-1/2" />}
                 <input
                   type={item.inputType || "text"}
                   name={item.name}
                   value={formData[item.name]}
                   onChange={handleChange}
-                  className="input-field"
-                  style={item.icon ? { paddingLeft: "2.25rem" } : {}}
+                  className={`w-full bg-[#faf9f5] border border-[#e5ded2] rounded-xl py-2 pr-3 text-xs text-[#2d2a26] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47] ${
+                    item.icon ? 'pl-9' : 'pl-3'
+                  }`}
                 />
               </div>
             </div>
@@ -146,14 +155,13 @@ const CreateTimetablePage = ({ setActiveTab }) => {
     if (field.inputType === "textarea") {
       return (
         <div key={`${sectionIdx}-${fieldIdx}`}>
-          <label className="input-label">{field.label}</label>
+          <label className="block text-xs font-semibold text-[#57524a] mb-1.5">{field.label}</label>
           <textarea
             name={field.name}
             value={formData[field.name]}
             onChange={handleChange}
             rows={2}
-            className="input-field resize-none"
-            style={{ lineHeight: "1.6" }}
+            className="w-full bg-[#faf9f5] border border-[#e5ded2] rounded-xl p-3 text-xs text-[#2d2a26] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47] resize-none"
           />
         </div>
       );
@@ -161,15 +169,17 @@ const CreateTimetablePage = ({ setActiveTab }) => {
 
     return (
       <div key={`${sectionIdx}-${fieldIdx}`}>
-        <label className="input-label">{field.label}</label>
-        <div className={field.icon ? "input-with-icon" : ""}>
-          {field.icon && <field.icon className="input-icon" />}
+        <label className="block text-xs font-semibold text-[#57524a] mb-1.5">{field.label}</label>
+        <div className="relative">
+          {field.icon && <field.icon className="w-4 h-4 text-[#8a8275] absolute left-3 top-1/2 -translate-y-1/2" />}
           <input
             type={field.inputType || "text"}
             name={field.name}
             value={formData[field.name]}
             onChange={handleChange}
-            className="input-field"
+            className={`w-full bg-[#faf9f5] border border-[#e5ded2] rounded-xl py-2 pr-3 text-xs text-[#2d2a26] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47] ${
+              field.icon ? 'pl-9' : 'pl-3'
+            }`}
           />
         </div>
       </div>
@@ -177,37 +187,22 @@ const CreateTimetablePage = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-6 panel-enter-3d">
-
+    <div className="w-full max-w-5xl mx-auto py-4 space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="bg-white rounded-2xl p-6 border border-[#e5ded2] shadow-xs flex items-center justify-between">
         <div>
-          <span className="section-eyebrow">Schedule Generation</span>
-          <h1
-            className="mt-1"
-            style={{
-              fontSize: "32px",
-              fontWeight: 800,
-              fontFamily: "'Space Grotesk', sans-serif",
-              letterSpacing: "-0.03em",
-              color: "var(--text-primary)",
-            }}
-          >
-            Initialize New{" "}
-            <span className="text-gradient-indigo">Timetable</span>
+          <span className="text-[11px] font-bold text-[#8c5e47] uppercase tracking-wider block">
+            Schedule Generation
+          </span>
+          <h1 className="text-2xl font-bold text-[#2d2a26] tracking-tight mt-1">
+            Initialize New Timetable
           </h1>
-          <p className="section-desc mt-2">
-            Configure institutional parameters to train the engine and generate a fully autonomous schedule.
+          <p className="text-xs text-[#8a8275] mt-1">
+            Configure institutional parameters to generate a fully optimized, collision-free schedule.
           </p>
         </div>
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-          style={{
-            background: "linear-gradient(145deg, #6366f1 0%, #4f46e5 100%)",
-            boxShadow: "0 4px 0 rgba(40,33,160,0.50), 0 8px 32px rgba(79,70,229,0.40), inset 0 1px 0 rgba(255,255,255,0.18)",
-          }}
-        >
-          <Sparkles className="w-6 h-6 text-white" />
+        <div className="w-12 h-12 rounded-xl bg-[#faf4ea] border border-[#ebd6b3] flex items-center justify-center shrink-0">
+          <Sparkles className="w-6 h-6 text-[#8c5e47]" />
         </div>
       </div>
 
@@ -216,19 +211,17 @@ const CreateTimetablePage = ({ setActiveTab }) => {
           {sections.map((section, sectionIdx) => {
             const SectionIcon = section.icon;
             return (
-              <div key={sectionIdx} className="glass-card p-6">
-                <h2
-                  className="text-base font-bold flex items-center gap-2.5 mb-6"
-                  style={{ color: "var(--text-primary)", fontFamily: "'Space Grotesk', sans-serif" }}
-                >
+              <div key={sectionIdx} className="app-card p-6">
+                <h2 className="text-sm font-bold text-[#2d2a26] flex items-center gap-2.5 mb-5 pb-3 border-b border-[#ede8df]">
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                     style={{
-                      background: `${section.iconColor}18`,
-                      border: `1px solid ${section.iconColor}33`,
+                      backgroundColor: section.bgColor,
+                      border: `1px solid ${section.borderColor}`,
+                      color: section.iconColor,
                     }}
                   >
-                    <SectionIcon className="w-4 h-4" style={{ color: section.iconColor }} />
+                    <SectionIcon className="w-4 h-4" />
                   </div>
                   {section.title}
                 </h2>
@@ -242,14 +235,11 @@ const CreateTimetablePage = ({ setActiveTab }) => {
         </div>
 
         {/* Submit Actions */}
-        <div
-          className="flex items-center justify-end gap-4 pt-5"
-          style={{ borderTop: "1px solid rgba(79,70,229,0.15)" }}
-        >
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#e5ded2]">
           <button
             type="button"
             onClick={() => setActiveTab('timetable')}
-            className="btn btn-ghost"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
@@ -257,12 +247,12 @@ const CreateTimetablePage = ({ setActiveTab }) => {
           <button
             type="submit"
             disabled={isGenerating}
-            className="btn btn-primary btn-lg"
+            className="btn-primary text-xs flex items-center gap-2 shadow-sm"
           >
             {isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Synthesizing…</span>
+                <span>Synthesizing Timetable…</span>
               </>
             ) : (
               <>

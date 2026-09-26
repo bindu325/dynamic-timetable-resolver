@@ -1,127 +1,108 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 /* ============================================================
-   DESIGN TOKENS — Deep Navy 3D SaaS Theme
+   ZEN LINEN DESIGN SYSTEM
+   Soft tactile linen textures, warm stone neutrals, sage & cedar accents
    ============================================================ */
 :root {
-  /* Base Palette */
-  --navy-950:   #040812;
-  --navy-900:   #070d1e;
-  --navy-800:   #0a1228;
-  --navy-700:   #0f1a35;
-  --navy-600:   #162240;
-  --navy-500:   #1e2d52;
+  /* Zen Linen Palette */
+  --zen-bg:              #f7f5f0;
+  --zen-bg-subtle:       #f2efe9;
+  --zen-card:            #ffffff;
+  --zen-card-elevated:   #faf9f5;
+  --zen-sidebar:         #f3efe6;
+  --zen-border:          #e6dfd5;
+  --zen-border-subtle:   #ede8df;
+  --zen-border-strong:   #d8cebf;
+  
+  /* Text & Ink Tokens */
+  --text-primary:        #2d2a26;
+  --text-secondary:      #57524a;
+  --text-muted:          #8a8275;
+  --text-faint:          #b5ada0;
+  --text-inverted:       #ffffff;
 
-  /* Surface System */
-  --bg-base:       var(--navy-900);
-  --bg-elevated:   rgba(15, 26, 53, 0.90);
-  --bg-raised:     rgba(22, 34, 64, 0.85);
-  --bg-surface:    rgba(15, 26, 53, 0.75);
-  --bg-overlay:    rgba(10, 18, 40, 0.96);
+  /* Zen Linen Signature Accents */
+  --zen-terracotta:      #8c5e47;
+  --zen-terracotta-hover:#784f3a;
+  --zen-terracotta-soft: rgba(140, 94, 71, 0.10);
+  --zen-sage:            #526b58;
+  --zen-sage-hover:      #445849;
+  --zen-sage-soft:       rgba(82, 107, 88, 0.12);
+  --zen-warm-amber:      #a87432;
+  --zen-warm-amber-soft: rgba(168, 116, 50, 0.10);
+  --zen-cedar:           #413b34;
+  --zen-slate:           #687076;
 
-  /* Glass System */
-  --glass-bg:          rgba(15, 26, 53, 0.65);
-  --glass-bg-light:    rgba(30, 45, 82, 0.45);
-  --glass-border:      rgba(79, 70, 229, 0.18);
-  --glass-border-hover:rgba(99, 91, 255, 0.35);
-  --glass-highlight:   rgba(255, 255, 255, 0.04);
+  /* Semantic System in Zen Linen Palette */
+  --success:             #4d7358;
+  --success-bg:          #edf5ee;
+  --success-border:      #c7decb;
+  --warning:             #a87432;
+  --warning-bg:          #faf4ea;
+  --warning-border:      #ebd6b3;
+  --error:               #a8483f;
+  --error-bg:            #faeceb;
+  --error-border:        #f0c7c3;
+  --info:                #49657b;
+  --info-bg:             #eef4f8;
+  --info-border:         #c5dae8;
 
-  /* Border System */
-  --border-subtle:  rgba(79, 70, 229, 0.10);
-  --border-default: rgba(79, 70, 229, 0.18);
-  --border-strong:  rgba(79, 70, 229, 0.35);
-  --border-accent:  rgba(79, 70, 229, 0.60);
+  /* Tactile Linen Shadows */
+  --shadow-xs:           0 1px 2px rgba(45, 42, 38, 0.04);
+  --shadow-sm:           0 2px 4px rgba(45, 42, 38, 0.04), 0 1px 2px rgba(45, 42, 38, 0.02);
+  --shadow-md:           0 4px 12px rgba(45, 42, 38, 0.06), 0 1px 3px rgba(45, 42, 38, 0.03);
+  --shadow-lg:           0 12px 30px rgba(45, 42, 38, 0.08), 0 4px 8px rgba(45, 42, 38, 0.04);
+  --shadow-card:         0 1px 3px rgba(45, 42, 38, 0.05), 0 6px 16px rgba(45, 42, 38, 0.03);
 
-  /* Text System — 100% contrast on dark navy */
-  --text-primary:   #ffffff;
-  --text-secondary: #d4deff;
-  --text-muted:     #9aabcc;
-  --text-faint:     #5e74a8;
-  --text-inverted:  #040812;
-
-  /* Accent — Electric Indigo */
-  --indigo:         #4f46e5;
-  --indigo-light:   #6366f1;
-  --indigo-hover:   #5b52f0;
-  --indigo-subtle:  rgba(79, 70, 229, 0.14);
-  --indigo-glow:    rgba(79, 70, 229, 0.30);
-
-  /* Secondary Accent — Silver/Steel */
-  --silver:         #94a3b8;
-  --silver-subtle:  rgba(148, 163, 184, 0.10);
-
-  /* Semantic Colors */
-  --success:        #10b981;
-  --success-bg:     rgba(16, 185, 129, 0.10);
-  --success-border: rgba(16, 185, 129, 0.25);
-  --warning:        #f59e0b;
-  --warning-bg:     rgba(245, 158, 11, 0.10);
-  --warning-border: rgba(245, 158, 11, 0.25);
-  --error:          #ef4444;
-  --error-bg:       rgba(239, 68, 68, 0.10);
-  --error-border:   rgba(239, 68, 68, 0.25);
-  --info:           #06b6d4;
-  --info-bg:        rgba(6, 182, 212, 0.10);
-
-  /* 3D Shadow System — top-left light source */
-  --shadow-xs:  0 1px 2px rgba(0,0,0,0.40);
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.30);
-  --shadow-md:  0 4px 20px rgba(0,0,0,0.50), 0 2px 6px rgba(0,0,0,0.35);
-  --shadow-lg:  0 8px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.40);
-  --shadow-xl:  0 16px 64px rgba(0,0,0,0.60), 0 8px 24px rgba(0,0,0,0.45);
-  --shadow-3d:  0 4px 0 rgba(0,0,0,0.30), 0 8px 30px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.25);
-  --shadow-indigo: 0 4px 24px rgba(79,70,229,0.30), 0 8px 48px rgba(79,70,229,0.15);
-  --shadow-inset: inset 0 1px 3px rgba(0,0,0,0.50), inset 0 0 0 1px rgba(255,255,255,0.03);
-
-  /* Border Radius */
+  /* Radius */
   --r-sm:   6px;
   --r-md:   10px;
   --r-lg:   14px;
   --r-xl:   18px;
   --r-2xl:  24px;
-  --r-3xl:  32px;
-  --r-full: 9999px;
-
-  /* Easing */
-  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ============================================================
    BASE RESET & TYPOGRAPHY
    ============================================================ */
 @layer base {
-  :root {
-    --bg-primary: #F8FAFC;
-    --card-bg: #FFFFFF;
-    --border-subtle: #E2E8F0;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-muted: #94A3B8;
-  }
-
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: var(--zen-bg);
+    color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    background-image: 
+      radial-gradient(#ded7cb 0.75px, transparent 0.75px), 
+      radial-gradient(#ded7cb 0.75px, #f7f5f0 0.75px);
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
   }
 }
 
-/* Base Card & Surface Tokens */
+/* ============================================================
+   ZEN LINEN CARD & CONTAINER UTILITIES
+   ============================================================ */
 .app-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  background-color: var(--zen-card);
+  border: 1px solid var(--zen-border);
+  border-radius: 1.125rem;
+  box-shadow: var(--shadow-card);
+}
+
+.app-card-elevated {
+  background-color: var(--zen-card-elevated);
+  border: 1px solid var(--zen-border);
+  border-radius: 1.125rem;
+  box-shadow: var(--shadow-md);
 }
 
 .app-card-hover {
@@ -129,23 +110,24 @@
 }
 
 .app-card-hover:hover {
-  border-color: #CBD5E1;
+  border-color: var(--zen-border-strong);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-md);
 }
 
 /* Stat & KPI Cards */
 .stat-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background-color: #ffffff;
+  border: 1px solid var(--zen-border);
   border-radius: 1rem;
   padding: 1.25rem;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-xs);
 }
 
 .stat-card:hover {
-  border-color: #99F6E4;
-  box-shadow: 0 4px 12px 0 rgba(13, 148, 136, 0.06);
+  border-color: var(--zen-terracotta);
+  box-shadow: 0 4px 16px rgba(140, 94, 71, 0.08);
 }
 
 .stat-label {
@@ -153,194 +135,158 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748B;
+  color: var(--text-muted);
   display: block;
 }
 
 .stat-value {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-top: 0.25rem;
   letter-spacing: -0.02em;
 }
 
 .stat-desc {
   font-size: 0.6875rem;
-  color: #94A3B8;
+  color: var(--text-muted);
   margin-top: 0.25rem;
   display: block;
 }
 
-/* Buttons */
+/* ============================================================
+   BUTTONS — Zen Linen Tactile Styling
+   ============================================================ */
 .btn-primary {
-  background-color: #0D9488;
-  color: #FFFFFF;
+  background-color: var(--zen-terracotta);
+  color: #ffffff;
   font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #0F766E;
-  box-shadow: 0 1px 2px 0 rgba(13, 148, 136, 0.2);
+  padding: 0.5rem 1.125rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--zen-terracotta-hover);
+  box-shadow: 0 1px 2px rgba(140, 94, 71, 0.25);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  background-color: #0F766E;
-  box-shadow: 0 4px 12px 0 rgba(13, 148, 136, 0.3);
+  background-color: var(--zen-terracotta-hover);
+  box-shadow: 0 3px 10px rgba(140, 94, 71, 0.30);
 }
 
 .btn-secondary {
-  background-color: #FFFFFF;
-  color: #334155;
+  background-color: #ffffff;
+  color: var(--text-secondary);
   font-weight: 600;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #CBD5E1;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  border-radius: 0.625rem;
+  border: 1px solid var(--zen-border);
+  box-shadow: var(--shadow-xs);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background-color: #F8FAFC;
-  color: #0F172A;
-  border-color: #94A3B8;
+  background-color: var(--zen-bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--zen-border-strong);
 }
 
-/* Table styling utilities */
+.btn-sage {
+  background-color: var(--zen-sage);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.5rem 1.125rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--zen-sage-hover);
+  box-shadow: 0 1px 2px rgba(82, 107, 88, 0.25);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-sage:hover {
+  background-color: var(--zen-sage-hover);
+  box-shadow: 0 3px 10px rgba(82, 107, 88, 0.30);
+}
+
+/* ============================================================
+   TABLE STYLING
+   ============================================================ */
 .table-header {
-  background-color: #F8FAFC;
-  color: #475569;
+  background-color: var(--zen-bg-subtle);
+  color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid var(--zen-border);
 }
 
 .table-row {
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--zen-border-subtle);
   transition: background-color 0.15s ease;
 }
 
 .table-row:hover {
-  background-color: #F8FAFC;
+  background-color: var(--zen-bg-subtle);
 }
 
-/* 3D Perspective & Transform Utilities */
-.perspective-1000 {
-  perspective: 1000px;
+/* ============================================================
+   ZEN LINEN TEXTURE BACKGROUNDS
+   ============================================================ */
+.zen-linen-texture {
+  background-color: var(--zen-bg);
+  background-image: 
+    radial-gradient(#ded7cb 0.75px, transparent 0.75px), 
+    radial-gradient(#ded7cb 0.75px, #f7f5f0 0.75px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
 }
 
-.perspective-1200 {
-  perspective: 1200px;
+.zen-linen-sidebar {
+  background: #f4f0e7;
+  border-right: 1px solid #e5ded2;
 }
 
-.transform-3d {
-  transform-style: preserve-3d;
-}
+/* 3D Perspective & Animations */
+.perspective-1000 { perspective: 1000px; }
+.perspective-1200 { perspective: 1200px; }
+.transform-3d { transform-style: preserve-3d; }
 
-.rotate-x-12 {
-  transform: rotateX(12deg) rotateY(-8deg);
-}
-
-/* Floating Animations */
 @keyframes float-slow {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(1deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(0.8deg); }
 }
 
 @keyframes float-delayed {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-14px) rotate(-1.5deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(-1deg); }
 }
 
 @keyframes float-subtle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
 }
 
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-}
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 7.5s ease-in-out infinite 1.5s; }
+.animate-float-subtle { animation: float-subtle 4.5s ease-in-out infinite; }
 
-.animate-float-slow {
-  animation: float-slow 6s ease-in-out infinite;
-}
-
-.animate-float-delayed {
-  animation: float-delayed 7.5s ease-in-out infinite 1.5s;
-}
-
-.animate-float-subtle {
-  animation: float-subtle 4.5s ease-in-out infinite;
-}
-
-.animate-pulse-ring {
-  animation: pulse-ring 3s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-float-slow,
-  .animate-float-delayed,
-  .animate-float-subtle,
-  .animate-pulse-ring {
-    animation: none !important;
-    transform: none !important;
-  }
-}
-
-/* Ambient Pattern Background */
-.bg-grid-pattern {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
-}
-
-.bg-dots-pattern {
-  background-size: 24px 24px;
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.25) 1px, transparent 1px);
-}
-
-/* Custom Scrollbars */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F8FAFC;
+  background: var(--zen-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #d8cebf;
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #baa996;
 }

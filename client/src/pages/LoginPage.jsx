@@ -52,18 +52,18 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8 font-sans">
-      <div className="w-full max-w-5xl bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[620px]">
+    <div className="min-h-screen bg-[#f7f5f0] flex items-center justify-center p-4 sm:p-8 font-sans">
+      <div className="w-full max-w-5xl bg-white rounded-3xl border border-[#e5ded2] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[620px]">
         {/* Left Side: Product Showcase & Value Prop */}
-        <div className="lg:col-span-6 bg-slate-900 text-white p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -top-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="lg:col-span-6 bg-[#2d2a26] text-[#f7f5f0] p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-[#8c5e47]/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -left-20 -top-20 w-80 h-80 bg-[#526b58]/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="space-y-6 relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-black">
-                  <CalendarDays className="w-5 h-5 text-slate-950" />
+                <div className="w-10 h-10 rounded-xl bg-[#8c5e47] text-white flex items-center justify-center font-black shadow-sm">
+                  <CalendarDays className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-extrabold text-base tracking-tight text-white">
                   Dynamic Timetable Resolver
@@ -73,7 +73,7 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
               {onBackToHome && (
                 <button
                   onClick={onBackToHome}
-                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-medium transition-colors"
+                  className="text-xs text-[#a39b8e] hover:text-white flex items-center gap-1 font-medium transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Home</span>
@@ -85,36 +85,36 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight font-heading">
                 Intelligent Academic Scheduling Operations
               </h2>
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              <p className="text-[#a39b8e] text-xs sm:text-sm leading-relaxed">
                 Autonomous constraint satisfaction, automated faculty-room collision resolution, and multi-factor timetable optimization.
               </p>
             </div>
 
             {/* Feature Highlights */}
-            <div className="space-y-3 pt-4 border-t border-slate-800">
-              <div className="flex items-center gap-3 text-xs text-slate-300">
-                <div className="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+            <div className="space-y-3 pt-4 border-t border-[#413b34]">
+              <div className="flex items-center gap-3 text-xs text-[#d8cebf]">
+                <div className="w-5 h-5 rounded-full bg-[#8c5e47]/30 text-[#e6dfd5] flex items-center justify-center">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#8c5e47]" />
                 </div>
                 <span>Autonomous multi-factor timetable generator</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-300">
-                <div className="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center">
-                  <Sparkles className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3 text-xs text-[#d8cebf]">
+                <div className="w-5 h-5 rounded-full bg-[#8c5e47]/30 text-[#e6dfd5] flex items-center justify-center">
+                  <Sparkles className="w-3.5 h-3.5 text-[#8c5e47]" />
                 </div>
                 <span>Real-time conflict detection & resolution engine</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-300">
-                <div className="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3 text-xs text-[#d8cebf]">
+                <div className="w-5 h-5 rounded-full bg-[#8c5e47]/30 text-[#e6dfd5] flex items-center justify-center">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#8c5e47]" />
                 </div>
                 <span>Role-based access (Administrator, Faculty, Student)</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-8 text-slate-500 text-[11px] relative z-10">
-            Operations Suite v2.4 · Academic Planning & Scheduling Infrastructure
+          <div className="pt-8 text-[#8a8275] text-[11px] relative z-10">
+            Zen Linen Operations Suite · Academic Planning & Scheduling
           </div>
         </div>
 
@@ -122,48 +122,48 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
         <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center bg-white">
           <div className="max-w-md w-full mx-auto space-y-6">
             <div className="space-y-1">
-              <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#8c5e47] uppercase tracking-wider">
                 Portal Authentication
               </span>
-              <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
+              <h3 className="text-2xl font-bold text-[#2d2a26] tracking-tight">
                 Sign in to your account
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#8a8275]">
                 Enter your academic credentials to manage or view schedules.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-xs font-semibold text-[#57524a]">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-[#8a8275] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="name@college.edu"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all font-medium"
+                    className="w-full bg-[#faf9f5] border border-[#e5ded2] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#2d2a26] placeholder-[#8a8275] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47] transition-all font-medium"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-xs font-semibold text-[#57524a]">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-[#8a8275] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="••••••••"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition-all font-medium"
+                    className="w-full bg-[#faf9f5] border border-[#e5ded2] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#2d2a26] placeholder-[#8a8275] focus:outline-none focus:ring-2 focus:ring-[#8c5e47]/20 focus:border-[#8c5e47] transition-all font-medium"
                   />
                 </div>
               </div>
@@ -171,7 +171,7 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
+                className="w-full mt-2 py-2.5 rounded-xl bg-[#8c5e47] hover:bg-[#784f3a] text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -185,40 +185,40 @@ const LoginPage = ({ onSwitchToSignup, onBackToHome }) => {
             </form>
 
             {/* Quick Login Presets */}
-            <div className="pt-4 border-t border-slate-100">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 text-center">
+            <div className="pt-4 border-t border-[#ede8df]">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#8a8275] mb-2.5 text-center">
                 Quick Login Presets:
               </span>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => handleQuickLogin('admin@college.edu')}
-                  className="px-2 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                  className="px-2 py-2 rounded-lg bg-[#faf9f5] border border-[#e5ded2] hover:bg-[#f2efe9] text-[#57524a] text-xs font-semibold transition-all cursor-pointer"
                 >
                   Admin
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickLogin('priya.sharma@college.edu')}
-                  className="px-2 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                  className="px-2 py-2 rounded-lg bg-[#faf9f5] border border-[#e5ded2] hover:bg-[#f2efe9] text-[#57524a] text-xs font-semibold transition-all cursor-pointer"
                 >
                   Faculty
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickLogin('viewer@college.edu')}
-                  className="px-2 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                  className="px-2 py-2 rounded-lg bg-[#faf9f5] border border-[#e5ded2] hover:bg-[#f2efe9] text-[#57524a] text-xs font-semibold transition-all cursor-pointer"
                 >
                   Viewer
                 </button>
               </div>
             </div>
 
-            <p className="text-center text-xs text-slate-500 font-medium">
+            <p className="text-center text-xs text-[#8a8275] font-medium">
               Don't have an account?{' '}
               <button
                 onClick={onSwitchToSignup}
-                className="text-teal-700 hover:text-teal-800 font-bold underline underline-offset-4 ml-1 cursor-pointer"
+                className="text-[#8c5e47] hover:text-[#784f3a] font-bold underline underline-offset-4 ml-1 cursor-pointer"
               >
                 Create an account
               </button>

@@ -9,6 +9,8 @@ import {
   DoorClosed,
   TrendingUp,
   Calendar,
+  BarChart3,
+  Activity,
 } from 'lucide-react';
 import {
   BarChart,
@@ -24,7 +26,7 @@ import {
   Legend,
 } from "recharts";
 
-const COLORS = ['#e11d48', '#f59e0b', '#0d9488', '#6366f1', '#ec4899', '#10b981', '#3b82f6'];
+const COLORS = ['#8c5e47', '#526b58', '#a87432', '#49657b', '#a8483f', '#687076', '#784f3a'];
 
 const AnalyticsPage = () => {
   const [data, setData] = useState(null);
@@ -44,63 +46,24 @@ const AnalyticsPage = () => {
   useEffect(() => { fetchAnalytics(); }, []);
 
   if (loading) {
-    return <div className="app-card p-16 text-center text-xs text-slate-400">Loading comprehensive analytics...</div>;
+    return <div className="app-card p-16 text-center text-xs text-[#8a8275]">Loading comprehensive analytics...</div>;
   }
 
   const { summary, roomUtilizationData, facultyWorkloadData, sectionWorkloadData, conflictTypeChartData } = data || {};
-
-  const kpis = [
-    {
-      label: "Periods Scheduled",
-      value: summary?.totalPeriodsScheduled || 0,
-      sub: "Across all cohorts",
-      icon: Activity,
-      color: "#a5b4fc",
-      bgColor: "rgba(79,70,229,0.12)",
-      borderColor: "rgba(79,70,229,0.22)",
-    },
-    {
-      label: "Resolution Rate",
-      value: `${summary?.resolutionRate || 100}%`,
-      sub: `${summary?.resolvedConflicts || 0} auto-resolved`,
-      icon: CheckCircle2,
-      color: "#6ee7b7",
-      bgColor: "rgba(16,185,129,0.10)",
-      borderColor: "rgba(16,185,129,0.22)",
-    },
-    {
-      label: "Active Conflicts",
-      value: summary?.activeConflicts || 0,
-      sub: "Requires review",
-      icon: AlertTriangle,
-      color: (summary?.activeConflicts || 0) > 0 ? "#fca5a5" : "#6ee7b7",
-      bgColor: (summary?.activeConflicts || 0) > 0 ? "rgba(239,68,68,0.10)" : "rgba(16,185,129,0.10)",
-      borderColor: (summary?.activeConflicts || 0) > 0 ? "rgba(239,68,68,0.22)" : "rgba(16,185,129,0.22)",
-    },
-    {
-      label: "Active Facilities",
-      value: summary?.totalRooms || 0,
-      sub: "Halls & labs",
-      icon: DoorClosed,
-      color: "#94a3b8",
-      bgColor: "rgba(148,163,184,0.08)",
-      borderColor: "rgba(148,163,184,0.18)",
-    },
-  ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="app-card p-6">
         <div className="flex items-center gap-2 mb-1">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#faf4ea] text-[#8c5e47] border border-[#ebd6b3]">
             <BarChart3 className="w-3.5 h-3.5" />
             Intelligence & Telemetry
           </span>
-          <span className="text-xs text-slate-500 font-medium">Institutional Analytics</span>
+          <span className="text-xs text-[#8a8275] font-medium">Institutional Analytics</span>
         </div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Timetable Analytics & Workload Metrics</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <h2 className="text-xl font-bold text-[#2d2a26] tracking-tight">Timetable Analytics & Workload Metrics</h2>
+        <p className="text-xs text-[#8a8275] mt-0.5">
           In-depth capacity utilization, faculty distribution balance, and conflict resolution efficiency.
         </p>
       </div>
@@ -115,13 +78,13 @@ const AnalyticsPage = () => {
 
         <div className="stat-card">
           <span className="stat-label">Resolution Rate</span>
-          <div className="text-2xl font-bold text-emerald-600 mt-1 tracking-tight">{summary?.resolutionRate || 100}%</div>
+          <div className="text-2xl font-bold text-[#4d7358] mt-1 tracking-tight">{summary?.resolutionRate || 100}%</div>
           <span className="stat-desc">{summary?.resolvedConflicts || 0} conflicts resolved</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Active Conflicts</span>
-          <div className={`text-2xl font-bold mt-1 tracking-tight ${summary?.activeConflicts > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+          <div className={`text-2xl font-bold mt-1 tracking-tight ${summary?.activeConflicts > 0 ? 'text-[#a8483f]' : 'text-[#4d7358]'}`}>
             {summary?.activeConflicts || 0}
           </div>
           <span className="stat-desc">Requiring attention</span>
@@ -138,18 +101,18 @@ const AnalyticsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Room Utilization */}
         <div className="app-card p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-0.5">Room Utilization Percentages</h3>
-          <p className="text-xs text-slate-500 mb-4">Booked periods vs max theoretical capacity</p>
+          <h3 className="text-sm font-bold text-[#2d2a26] mb-0.5">Room Utilization Percentages</h3>
+          <p className="text-xs text-[#8a8275] mb-4">Booked periods vs max theoretical capacity</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={roomUtilizationData || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="roomNumber" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} unit="%" tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ede8df" vertical={false} />
+                <XAxis dataKey="roomNumber" stroke="#8a8275" fontSize={11} tickLine={false} />
+                <YAxis stroke="#8a8275" fontSize={11} unit="%" tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5ded2', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(45,42,38,0.06)', color: '#2d2a26' }}
                 />
-                <Bar dataKey="utilizationRate" fill="#0d9488" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="utilizationRate" fill="#8c5e47" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -157,18 +120,18 @@ const AnalyticsPage = () => {
 
         {/* Faculty Workload Distribution */}
         <div className="app-card p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-0.5">Faculty Teaching Workload (Hours/Week)</h3>
-          <p className="text-xs text-slate-500 mb-4">Assigned lecture hours per staff member</p>
+          <h3 className="text-sm font-bold text-[#2d2a26] mb-0.5">Faculty Teaching Workload (Hours/Week)</h3>
+          <p className="text-xs text-[#8a8275] mb-4">Assigned lecture hours per staff member</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={(facultyWorkloadData || []).slice(0, 10)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} tickFormatter={(v) => v.split(' ')[1] || v} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ede8df" vertical={false} />
+                <XAxis dataKey="name" stroke="#8a8275" fontSize={10} tickLine={false} tickFormatter={(v) => v.split(' ')[1] || v} />
+                <YAxis stroke="#8a8275" fontSize={11} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5ded2', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(45,42,38,0.06)', color: '#2d2a26' }}
                 />
-                <Bar dataKey="assignedHours" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="assignedHours" fill="#526b58" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -176,8 +139,8 @@ const AnalyticsPage = () => {
 
         {/* Conflict Type Breakdown Pie Chart */}
         <div className="app-card p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-0.5">Conflict Distribution by Constraint Type</h3>
-          <p className="text-xs text-slate-500 mb-4">Historical & active collision classifications</p>
+          <h3 className="text-sm font-bold text-[#2d2a26] mb-0.5">Conflict Distribution by Constraint Type</h3>
+          <p className="text-xs text-[#8a8275] mb-4">Historical & active collision classifications</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -195,7 +158,7 @@ const AnalyticsPage = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5ded2', borderRadius: '10px', fontSize: '12px', boxShadow: '0 4px 12px rgba(45,42,38,0.06)', color: '#2d2a26' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
               </PieChart>
@@ -205,21 +168,21 @@ const AnalyticsPage = () => {
 
         {/* Section Load Table / Metrics */}
         <div className="app-card p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-0.5">Section Load Breakdown</h3>
-          <p className="text-xs text-slate-500 mb-4">Weekly class hours scheduled per student cohort</p>
+          <h3 className="text-sm font-bold text-[#2d2a26] mb-0.5">Section Load Breakdown</h3>
+          <p className="text-xs text-[#8a8275] mb-4">Weekly class hours scheduled per student cohort</p>
           <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
             {(sectionWorkloadData || []).map((sec) => (
               <div
                 key={sec.name}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs"
+                className="flex items-center justify-between p-3 rounded-xl bg-[#faf9f5] border border-[#ede8df] text-xs"
               >
                 <div>
-                  <span className="font-bold text-slate-900">{sec.name}</span>
-                  <span className="text-slate-400 ml-2">({sec.department})</span>
+                  <span className="font-bold text-[#2d2a26]">{sec.name}</span>
+                  <span className="text-[#8a8275] ml-2">({sec.department})</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-500 font-medium">{sec.studentCount} students</span>
-                  <span className="px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200/60">
+                  <span className="text-[#57524a] font-medium">{sec.studentCount} students</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#faf4ea] text-[#8c5e47] font-bold border border-[#ebd6b3]">
                     {sec.classesCount} periods/wk
                   </span>
                 </div>

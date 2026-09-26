@@ -19,17 +19,17 @@ import {
 } from 'lucide-react';
 
 const DEPT_COLORS = {
-  CSE:   { bg: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.25)", color: "#a5b4fc" },
-  ECE:   { bg: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.22)", color: "#6ee7b7" },
-  MECH:  { bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.22)", color: "#fcd34d" },
-  CIVIL: { bg: "rgba(239,68,68,0.10)",  border: "rgba(239,68,68,0.22)",  color: "#fca5a5" },
-  EEE:   { bg: "rgba(6,182,212,0.10)",  border: "rgba(6,182,212,0.22)",  color: "#67e8f9" },
+  CSE:   { bg: "rgba(140, 94, 71, 0.10)", border: "rgba(140, 94, 71, 0.25)", color: "#8c5e47" },
+  ECE:   { bg: "rgba(82, 107, 88, 0.12)", border: "rgba(82, 107, 88, 0.25)", color: "#526b58" },
+  MECH:  { bg: "rgba(168, 116, 50, 0.10)", border: "rgba(168, 116, 50, 0.25)", color: "#a87432" },
+  CIVIL: { bg: "rgba(168, 72, 63, 0.10)", border: "rgba(168, 72, 63, 0.25)", color: "#a8483f" },
+  EEE:   { bg: "rgba(73, 101, 123, 0.10)", border: "rgba(73, 101, 123, 0.25)", color: "#49657b" },
 };
 
 const getDeptStyle = (dept) => DEPT_COLORS[dept] || {
-  bg: "rgba(79,70,229,0.10)",
-  border: "rgba(79,70,229,0.20)",
-  color: "#a5b4fc",
+  bg: "rgba(140, 94, 71, 0.10)",
+  border: "rgba(140, 94, 71, 0.20)",
+  color: "#8c5e47",
 };
 
 const FacultyPage = ({ onConfigureAvailability }) => {

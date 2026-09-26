@@ -80,16 +80,16 @@ const DashboardPage = ({ setActiveTab }) => {
   return (
     <div className="space-y-6">
       {/* Top Welcome / Action Banner */}
-      <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-[#ffffff] rounded-2xl p-6 sm:p-7 border border-[#e5ded2] shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-1.5 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md text-[11px] font-bold text-teal-800 bg-teal-50 border border-teal-200 uppercase tracking-wider">
-            <CalendarCheck className="w-3.5 h-3.5 text-teal-700" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md text-[11px] font-bold text-[#8c5e47] bg-[#faf4ea] border border-[#ebd6b3] uppercase tracking-wider">
+            <CalendarCheck className="w-3.5 h-3.5 text-[#8c5e47]" />
             Institutional Scheduling Console
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#2d2a26] tracking-tight">
             Academic Operations & Timetable Overview
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8a8275] leading-relaxed">
             Monitor real-time resource allocations, constraint validations, and automated conflict resolutions across all departments.
           </p>
         </div>
@@ -97,16 +97,16 @@ const DashboardPage = ({ setActiveTab }) => {
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
             onClick={() => setActiveTab('resolver')}
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs flex items-center gap-2 transition-all cursor-pointer active:scale-98"
+            className="px-4 py-2 rounded-xl bg-[#8c5e47] hover:bg-[#784f3a] text-white text-xs font-semibold shadow-xs flex items-center gap-2 transition-all cursor-pointer active:scale-98"
           >
-            <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+            <Sparkles className="w-3.5 h-3.5 text-[#fdedd9]" />
             <span>Open Conflict Resolver</span>
           </button>
           <button
             onClick={() => setActiveTab('timetable')}
-            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 shadow-xs flex items-center gap-2 transition-all cursor-pointer active:scale-98"
+            className="px-4 py-2 rounded-xl bg-[#ffffff] hover:bg-[#f7f5f0] text-[#57524a] text-xs font-semibold border border-[#e5ded2] shadow-xs flex items-center gap-2 transition-all cursor-pointer active:scale-98"
           >
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+            <Calendar className="w-3.5 h-3.5 text-[#8a8275]" />
             <span>View Timetable Grid</span>
           </button>
         </div>
@@ -120,28 +120,28 @@ const DashboardPage = ({ setActiveTab }) => {
             <div
               key={card.title}
               onClick={() => setActiveTab(card.path)}
-              className={`bg-white p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md hover:border-slate-300 flex flex-col justify-between ${
+              className={`bg-white p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md flex flex-col justify-between ${
                 card.highlight
-                  ? 'border-rose-300 bg-rose-50/40'
-                  : 'border-slate-200'
+                  ? 'border-[#f0c7c3] bg-[#faeceb]/60'
+                  : 'border-[#e5ded2] hover:border-[#d8cebf]'
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider truncate">{card.title}</span>
-                  <div className={`p-1.5 rounded-md ${card.highlight ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
+                  <span className="text-[11px] font-bold text-[#8a8275] uppercase tracking-wider truncate">{card.title}</span>
+                  <div className={`p-1.5 rounded-md ${card.highlight ? 'bg-[#faeceb] text-[#a8483f]' : 'bg-[#f4f0e7] text-[#57524a]'}`}>
                     <Icon className="w-3.5 h-3.5" />
                   </div>
                 </div>
-                <div className={`text-2xl font-extrabold tracking-tight ${card.highlight ? 'text-rose-600' : 'text-slate-900'}`}>
+                <div className={`text-2xl font-extrabold tracking-tight ${card.highlight ? 'text-[#a8483f]' : 'text-[#2d2a26]'}`}>
                   {card.count}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5 truncate">{card.subtitle}</div>
+                <div className="text-[11px] text-[#8a8275] mt-0.5 truncate">{card.subtitle}</div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-teal-700">
+              <div className="mt-3 pt-2.5 border-t border-[#ede8df] flex items-center justify-between text-[11px] font-semibold text-[#8c5e47]">
                 <span>Manage</span>
-                <ArrowUpRight className="w-3 h-3 text-teal-600" />
+                <ArrowUpRight className="w-3 h-3 text-[#8c5e47]" />
               </div>
             </div>
           );
@@ -150,56 +150,56 @@ const DashboardPage = ({ setActiveTab }) => {
 
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
-            <Percent className="w-5 h-5 text-teal-700" />
+        <div className="bg-white p-5 rounded-xl border border-[#e5ded2] shadow-xs flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-[#faf4ea] border border-[#ebd6b3] flex items-center justify-center shrink-0">
+            <Percent className="w-5 h-5 text-[#8c5e47]" />
           </div>
           <div className="flex-1 min-w-0">
-            <span className="text-xs font-semibold text-slate-500">Average Room Utilization</span>
-            <div className="text-lg font-bold text-slate-900 mt-0.5">
+            <span className="text-xs font-semibold text-[#8a8275]">Average Room Utilization</span>
+            <div className="text-lg font-bold text-[#2d2a26] mt-0.5">
               {stats?.roomUtilization || 0}%
             </div>
-            <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="w-full bg-[#f4f0e7] h-1.5 rounded-full mt-2 overflow-hidden">
               <div
-                className="bg-teal-600 h-full rounded-full transition-all duration-500"
+                className="bg-[#8c5e47] h-full rounded-full transition-all duration-500"
                 style={{ width: `${stats?.roomUtilization || 0}%` }}
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
-            <Clock className="w-5 h-5 text-blue-700" />
+        <div className="bg-white p-5 rounded-xl border border-[#e5ded2] shadow-xs flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-[#edf5ee] border border-[#c7decb] flex items-center justify-center shrink-0">
+            <Clock className="w-5 h-5 text-[#526b58]" />
           </div>
           <div>
-            <span className="text-xs font-semibold text-slate-500">Avg Faculty Workload</span>
-            <div className="text-lg font-bold text-slate-900 mt-0.5">
-              {stats?.avgFacultyWorkload || 0} <span className="text-xs text-slate-400 font-normal">hrs / week</span>
+            <span className="text-xs font-semibold text-[#8a8275]">Avg Faculty Workload</span>
+            <div className="text-lg font-bold text-[#2d2a26] mt-0.5">
+              {stats?.avgFacultyWorkload || 0} <span className="text-xs text-[#8a8275] font-normal">hrs / week</span>
             </div>
-            <span className="text-[11px] text-slate-400">Target baseline: 18 - 22 hrs</span>
+            <span className="text-[11px] text-[#8a8275]">Target baseline: 18 - 22 hrs</span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-4">
+        <div className="bg-white p-5 rounded-xl border border-[#e5ded2] shadow-xs flex items-center gap-4">
           <div
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
               stats?.activeConflicts === 0
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                : 'bg-rose-50 border-rose-200 text-rose-700'
+                ? 'bg-[#edf5ee] border-[#c7decb] text-[#4d7358]'
+                : 'bg-[#faeceb] border-[#f0c7c3] text-[#a8483f]'
             }`}
           >
             {stats?.activeConflicts === 0 ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <CheckCircle2 className="w-5 h-5 text-[#4d7358]" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-rose-600" />
+              <AlertTriangle className="w-5 h-5 text-[#a8483f]" />
             )}
           </div>
           <div>
-            <span className="text-xs font-semibold text-slate-500">Timetable Integrity State</span>
+            <span className="text-xs font-semibold text-[#8a8275]">Timetable Integrity State</span>
             <div
               className={`text-base font-bold mt-0.5 ${
-                stats?.activeConflicts === 0 ? 'text-emerald-700' : 'text-rose-600'
+                stats?.activeConflicts === 0 ? 'text-[#4d7358]' : 'text-[#a8483f]'
               }`}
             >
               {stats?.activeConflicts === 0 ? 'Optimal (0 Conflicts)' : `${stats?.activeConflicts} Action Required`}
@@ -210,39 +210,39 @@ const DashboardPage = ({ setActiveTab }) => {
 
       {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="bg-white p-6 rounded-2xl border border-[#e5ded2] shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Weekly Class Distribution</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Periods scheduled per day across all departments</p>
+              <h3 className="text-sm font-bold text-[#2d2a26]">Weekly Class Distribution</h3>
+              <p className="text-xs text-[#8a8275] mt-0.5">Periods scheduled per day across all departments</p>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200">
-              <Activity className="w-4 h-4 text-slate-500" />
+            <div className="p-1.5 rounded-lg bg-[#f4f0e7] border border-[#e5ded2]">
+              <Activity className="w-4 h-4 text-[#57524a]" />
             </div>
           </div>
           <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats?.dayDistribution || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ede8df" vertical={false} />
+                <XAxis dataKey="day" stroke="#8a8275" fontSize={11} tickLine={false} />
+                <YAxis stroke="#8a8275" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5ded2', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', color: '#2d2a26' }}
                 />
-                <Bar dataKey="classes" fill="#0f766e" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="classes" fill="#8c5e47" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="bg-white p-6 rounded-2xl border border-[#e5ded2] shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Department Course Load</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Total scheduled lecture and lab volume</p>
+              <h3 className="text-sm font-bold text-[#2d2a26]">Department Course Load</h3>
+              <p className="text-xs text-[#8a8275] mt-0.5">Total scheduled lecture and lab volume</p>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200">
-              <Layers className="w-4 h-4 text-slate-500" />
+            <div className="p-1.5 rounded-lg bg-[#f4f0e7] border border-[#e5ded2]">
+              <Layers className="w-4 h-4 text-[#57524a]" />
             </div>
           </div>
           <div style={{ height: 220 }}>
@@ -253,17 +253,17 @@ const DashboardPage = ({ setActiveTab }) => {
               >
                 <defs>
                   <linearGradient id="colorClasses" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0284c7" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#0284c7" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#526b58" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#526b58" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="department" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ede8df" vertical={false} />
+                <XAxis dataKey="department" stroke="#8a8275" fontSize={11} tickLine={false} />
+                <YAxis stroke="#8a8275" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e5ded2', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', color: '#2d2a26' }}
                 />
-                <Area type="monotone" dataKey="classes" stroke="#0284c7" strokeWidth={2} fillOpacity={1} fill="url(#colorClasses)" />
+                <Area type="monotone" dataKey="classes" stroke="#526b58" strokeWidth={2} fillOpacity={1} fill="url(#colorClasses)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
